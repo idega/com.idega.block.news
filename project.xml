@@ -1,16 +1,16 @@
 <project>
+	 <extend>../com.idega.core.bundle/block-dependencies.xml</extend>
     <pomVersion>3</pomVersion>
     <name>idegaWeb News Block</name>
-    <groupId>com.idega.block</groupId>
     <artifactId>com.idega.block.news</artifactId>
-    <currentVersion>2.0</currentVersion>
+    <currentVersion>1.0</currentVersion>
     <organization>
         <name>idega software</name>
         <url>http://www.idega.com</url>
         <logo>http://support.idega.is/images/idegalogo2.gif</logo>
     </organization>
     <inceptionYear>2000</inceptionYear>
-    <shortDescription>idegaWeb Builder is</shortDescription>
+    <shortDescription>News block</shortDescription>
     <issueTrackingUrl>http://issues.idega.is</issueTrackingUrl>
     <repository>
         <connection>scm:cvs:ext:tryggvil@einstein.idega.is:/idega/cvs:bundles/com.idega.builder.bundle</connection>
@@ -58,12 +58,54 @@
     </developers>
     <dependencies>
         <dependency>
-            <groupId>com.idega.core</groupId>
+            <groupId>bundles</groupId>
             <artifactId>com.idega.core</artifactId>
             <version>2.0</version>
             <type>jar</type>
             <url>http://www.idega.com/</url>
-            <properties/>
+            <properties>
+                <eclipse.dependency>true</eclipse.dependency>
+            </properties>
+		</dependency>
+		<dependency>
+            <groupId>bundles</groupId>
+            <artifactId>com.idega.block.media</artifactId>
+            <version>1.0</version>
+            <type>jar</type>
+            <url>http://www.idega.com/</url>
+            <properties>
+                <eclipse.dependency>true</eclipse.dependency>
+            </properties>
+       </dependency>
+       <dependency>
+            <groupId>bundles</groupId>
+            <artifactId>com.idega.block.image</artifactId>
+            <version>1.0</version>
+            <type>jar</type>
+            <url>http://www.idega.com/</url>
+            <properties>
+                <eclipse.dependency>true</eclipse.dependency>
+            </properties>
+       </dependency>
+       <dependency>
+            <groupId>bundles</groupId>
+            <artifactId>com.idega.block.text</artifactId>
+            <version>1.0</version>
+            <type>jar</type>
+            <url>http://www.idega.com/</url>
+            <properties>
+                <eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
+       <dependency>
+            <groupId>bundles</groupId>
+            <artifactId>com.idega.block.category</artifactId>
+            <version>1.0</version>
+            <type>jar</type>
+            <url>http://www.idega.com/</url>
+            <properties>
+                <eclipse.dependency>true</eclipse.dependency>
+            </properties>
         </dependency>
     </dependencies>
     <build>
