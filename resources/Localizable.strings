@@ -1,4 +1,3 @@
-#Mon Oct 27 01:32:58 CET 2003
 author=H\u00F6fundur
 back=Back
 category=Category
@@ -30,3 +29,4 @@ teaser=Teaser
 updated=Updated
 visible_days=Number of days visible
 welcome_message.morning=
+wrong_confirm=
