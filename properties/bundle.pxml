@@ -91,6 +91,11 @@
       <type>java.lang.String</type>
       <value>com.idega.block.news.business.NewsBundleStarter</value>
     </key>
+    <key>
+      <name>publish_to_years</name>
+      <type>java.lang.String</type>
+      <value>0</value>
+    </key>
   </map>
 </pxml>
 
