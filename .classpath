@@ -5,15 +5,15 @@
   </classpathentry>
   <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
   </classpathentry>
-  <classpathentry kind="var" path="MAVEN_REPO/bundles/jars/com.idega.core-SNAPSHOT.jar">
+  <classpathentry kind="var" path="MAVEN_REPO/bundles/jars/com.idega.core-3.0.5.jar">
   </classpathentry>
-  <classpathentry kind="var" path="MAVEN_REPO/bundles/jars/com.idega.block.media-SNAPSHOT.jar">
+  <classpathentry kind="var" path="MAVEN_REPO/bundles/jars/com.idega.block.media-1.1.2.jar">
   </classpathentry>
-  <classpathentry kind="var" path="MAVEN_REPO/bundles/jars/com.idega.block.image-SNAPSHOT.jar">
+  <classpathentry kind="var" path="MAVEN_REPO/bundles/jars/com.idega.block.image-1.0.1.jar">
   </classpathentry>
-  <classpathentry kind="var" path="MAVEN_REPO/bundles/jars/com.idega.block.text-SNAPSHOT.jar">
+  <classpathentry kind="var" path="MAVEN_REPO/bundles/jars/com.idega.block.text-1.0.1.jar">
   </classpathentry>
-  <classpathentry kind="var" path="MAVEN_REPO/bundles/jars/com.idega.block.category-SNAPSHOT.jar">
+  <classpathentry kind="var" path="MAVEN_REPO/bundles/jars/com.idega.block.category-1.0.1.jar">
   </classpathentry>
   <classpathentry kind="var" path="MAVEN_REPO/jdom/jars/jdom-1.0.jar">
   </classpathentry>
