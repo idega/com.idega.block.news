@@ -62,9 +62,9 @@
       <type>jar</type>
       <url>http://www.idega.com/</url>
       <properties>
-        <j:if test="${idegaweb.project.source.dependent}==&apos;true&apos;}">
+        <!--<j:if test="${idegaweb.project.source.dependent}==&apos;true&apos;}">-->
           <eclipse.dependency>true</eclipse.dependency>
-        </j:if>
+        <!--</j:if>-->
       </properties>
     </dependency>
     <dependency>
@@ -76,9 +76,9 @@
       <type>jar</type>
       <url>http://www.idega.com/</url>
       <properties>
-        <j:if test="${idegaweb.project.source.dependent}==&apos;true&apos;}">
+      <!--<j:if test="${idegaweb.project.source.dependent}==&apos;true&apos;}">-->
           <eclipse.dependency>true</eclipse.dependency>
-        </j:if>
+        <!--</j:if>-->
       </properties>
     </dependency>
     <dependency>
@@ -90,9 +90,9 @@
       <type>jar</type>
       <url>http://www.idega.com/</url>
       <properties>
-        <j:if test="${idegaweb.project.source.dependent}==&apos;true&apos;}">
+        <!--<j:if test="${idegaweb.project.source.dependent}==&apos;true&apos;}">-->
           <eclipse.dependency>true</eclipse.dependency>
-        </j:if>
+        <!--</j:if>-->
       </properties>
     </dependency>
     <dependency>
@@ -104,9 +104,9 @@
       <type>jar</type>
       <url>http://www.idega.com/</url>
       <properties>
-        <j:if test="${idegaweb.project.source.dependent}==&apos;true&apos;}">
+        <!--<j:if test="${idegaweb.project.source.dependent}==&apos;true&apos;}">-->
           <eclipse.dependency>true</eclipse.dependency>
-        </j:if>
+        <!--</j:if>-->
       </properties>
     </dependency>
     <dependency>
@@ -118,9 +118,9 @@
       <type>jar</type>
       <url>http://www.idega.com/</url>
       <properties>
-        <j:if test="${idegaweb.project.source.dependent}==&apos;true&apos;}">
+        <!--<j:if test="${idegaweb.project.source.dependent}==&apos;true&apos;}">-->
           <eclipse.dependency>true</eclipse.dependency>
-        </j:if>
+        <!--</j:if>-->
       </properties>
     </dependency>
   </dependencies>
