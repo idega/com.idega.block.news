@@ -1,5 +1,5 @@
 /*
- * $Id: NewsReader.java,v 1.141 2005/07/27 14:19:52 laddi Exp $
+ * $Id: NewsReader.java,v 1.142 2005/11/29 12:53:18 laddi Exp $
  *
  * Copyright (C) 2001 Idega hf. All Rights Reserved.
  *
@@ -412,10 +412,10 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 		IWTimestamp created = new IWTimestamp(newsHelper.getContentHelper().getContent().getCreated());
 		IWTimestamp updated = new IWTimestamp(newsHelper.getContentHelper().getContent().getLastUpdated());
 
-		Text tFrom = formatText(df.format((java.util.Date) from.getTimestamp()), true);
-		Text tTo = formatText(df.format((java.util.Date) to.getTimestamp()), true);
-		Text tCreated = formatText(df.format((java.util.Date) created.getTimestamp()), false);
-		Text tUpdated = formatText(df.format((java.util.Date) updated.getTimestamp()), false);
+		Text tFrom = formatText(df.format(from.getTimestamp()), true);
+		Text tTo = formatText(df.format(to.getTimestamp()), true);
+		Text tCreated = formatText(df.format(created.getTimestamp()), false);
+		Text tUpdated = formatText(df.format(updated.getTimestamp()), false);
 
 		// Unpublished
 		if (from.isLaterThan(now)) {
