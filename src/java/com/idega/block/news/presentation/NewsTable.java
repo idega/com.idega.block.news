@@ -31,8 +31,6 @@ public class NewsTable extends PresentationObjectContainer {
 
 
 
-  private int linejump = 1;
-
   protected int tableRows;
 
   protected int tableColumns;

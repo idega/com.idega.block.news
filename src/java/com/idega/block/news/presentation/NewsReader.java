@@ -1,5 +1,5 @@
 /*
- * $Id: NewsReader.java,v 1.143 2006/02/20 11:06:29 laddi Exp $
+ * $Id: NewsReader.java,v 1.144 2006/02/22 21:03:29 laddi Exp $
  *
  * Copyright (C) 2001 Idega hf. All Rights Reserved.
  *
@@ -30,7 +30,6 @@ import com.idega.block.text.business.ContentHelper;
 import com.idega.block.text.data.Content;
 import com.idega.block.text.data.LocalizedText;
 import com.idega.core.file.data.ICFile;
-import com.idega.core.user.data.User;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.idegaweb.block.presentation.Builderaware;
@@ -59,14 +58,7 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 	public final static String CACHE_KEY = "nw_news";
 	private boolean hasEdit = false, hasAdd = false, hasInfo = false, hasEditExisting = false;
 	private int iCategoryId = -1;
-	private String attributeName = null;
-	private int attributeId = -1;
-	private User eUser = null;
-
 	private boolean showNewsCollectionButton = false;
-	private int categoryId = 0;
-
-	private Table outerTable = new Table(1, 1);
 
 	private int numberOfLetters = 273;
 	private int numberOfHeadlineLetters = -1;
@@ -80,7 +72,6 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 	private int cellSpacing = 0;
 	private int viewPageId = -1;
 	private int textSize = 2;
-	private int firstImageWidth = 200;
 	private int ImageWidth = 100;
 	private int ImageBorder = 1;
 	private int dateWidth = 60;
@@ -125,13 +116,8 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 	private Image spacerImage = null;
 
 	private static String prmFromPage = "nwr_from_page";
-	private static String prmDelete = "nwr_delete";
-	private static String prmEdit = "nwr_edit";
-	private static String prmNew = "nwr_new";
 	private static String prmMore = "nwr_more";
 	private static String prmCollection = "nwr_collection";
-	private static String prmObjIns = "nwr_instance_id";
-
 	public static String prmListCategory = "nwr_newscategoryid";
 	public static String prmNewsCategoryId = "nwr_listcategory";
 
@@ -191,10 +177,6 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 		informationProxy.setFontColor("#666666");
 		textProxy.setFontSize(1);
 		informationProxy.setFontSize(1);
-	}
-
-	private void checkCategories() {
-
 	}
 
 	/** @todo take out when instanceId handler is used */
@@ -913,16 +895,6 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 		return NewsBusiness.disconnectBlock(instanceid);
 	}
 
-	public void setConnectionAttributes(String attributeName, int attributeId) {
-		this.attributeName = attributeName;
-		this.attributeId = attributeId;
-	}
-
-	public void setConnectionAttributes(String attributeName, String attributeId) {
-		this.attributeName = attributeName;
-		this.attributeId = Integer.parseInt(attributeId);
-	}
-
 	/*
 	 * * This method uses static layouts from this class *
 	 */
@@ -1176,7 +1148,6 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 	}
 
 	public void setFirstImageWidth(int imageWith) {
-		firstImageWidth = imageWith;
 	}
 
 	public void setImageWidth(int imagewidth) {
