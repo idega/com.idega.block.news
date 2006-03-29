@@ -17,6 +17,7 @@ import com.idega.block.news.data.NwNewsHome;
 import com.idega.block.text.business.ContentBusiness;
 import com.idega.block.text.data.Content;
 import com.idega.core.component.data.ICObjectInstance;
+import com.idega.data.GenericEntity;
 import com.idega.data.IDOLookup;
 import com.idega.data.IDOLookupException;
 
@@ -132,7 +133,7 @@ public class NewsBusiness {
 
 		if (fromCategoryId > 0 && toCategoryId > 0) {
 
-			NwNews news = (NwNews) com.idega.block.news.data.NwNewsBMPBean.getStaticInstance(NwNews.class);
+			NwNews news = (NwNews) GenericEntity.getStaticInstance(NwNews.class);
 
 			StringBuffer sql = new StringBuffer("update ");
 

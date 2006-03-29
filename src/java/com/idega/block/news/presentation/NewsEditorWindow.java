@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
 import com.idega.block.category.business.CategoryFinder;
+import com.idega.block.category.data.ICCategoryBMPBean;
 import com.idega.block.media.presentation.ImageInserter;
 import com.idega.block.news.business.NewsBusiness;
 import com.idega.block.news.business.NewsFinder;
@@ -26,6 +27,7 @@ import com.idega.core.localisation.presentation.ICLocalePresentation;
 import com.idega.core.user.data.User;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWResourceBundle;
+import com.idega.idegaweb.block.presentation.Builderaware;
 import com.idega.idegaweb.presentation.IWAdminWindow;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Image;
@@ -369,7 +371,7 @@ private IWResourceBundle iwrb;
   public String getColumnString(NewsCategoryAttribute[] attribs){
     String values = "";
     for (int i = 0 ; i < attribs.length ; i++) {
-      values += com.idega.block.news.data.NewsCategoryBMPBean.getColumnName()+"_id = '"+attribs[i].getNewsCategoryId()+"'" ;
+      values += ICCategoryBMPBean.getColumnName()+"_id = '"+attribs[i].getNewsCategoryId()+"'" ;
       if( i!= (attribs.length-1) ) values += " OR ";
     }
     return values;
@@ -642,7 +644,7 @@ private IWResourceBundle iwrb;
     iUserId = eUser != null?eUser.getID():-1;
     iwb = getBundle(iwc);
     iwrb = getResourceBundle(iwc);
-		core = iwc.getIWMainApplication().getBundle(NewsReader.IW_CORE_BUNDLE_IDENTIFIER);
+		core = iwc.getIWMainApplication().getBundle(Builderaware.IW_CORE_BUNDLE_IDENTIFIER);
     addTitle(iwrb.getLocalizedString("news_editor","News Editor"));
     control(iwc);
   }

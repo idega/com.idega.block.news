@@ -26,6 +26,7 @@ import com.idega.block.category.data.ICCategory;
 import com.idega.block.news.data.NewsCategory;
 import com.idega.block.news.data.NwNews;
 import com.idega.block.news.data.NwNewsHome;
+import com.idega.data.GenericEntity;
 import com.idega.data.IDOLegacyEntity;
 import com.idega.data.IDOLookup;
 import com.idega.data.IDOLookupException;
@@ -146,7 +147,7 @@ public class NewsBundleStarter implements IWBundleStartable{
 
   public static void moveNewsBetweenCategories(int fromCategoryId,int toCategoryId){
     if(fromCategoryId > 0 && toCategoryId > 0){
-      NwNews news = (NwNews) com.idega.block.news.data.NwNewsBMPBean.getStaticInstance(NwNews.class);
+      NwNews news = (NwNews) GenericEntity.getStaticInstance(NwNews.class);
       StringBuffer sql = new StringBuffer("update ");
       sql.append(news.getEntityName());
       sql.append(" set ");
