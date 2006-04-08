@@ -53,7 +53,7 @@ public class NewsTable extends PresentationObjectContainer {
 
   private String sAlign = "left";
 
-	boolean zebracolored = false,usecolor = false;;
+	boolean zebracolored = false,usecolor = false;
 
 
 
