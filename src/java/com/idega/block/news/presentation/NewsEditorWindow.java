@@ -113,19 +113,19 @@ private IWResourceBundle iwrb;
   }
 
   private void init(){
-    sHeadline = iwrb.getLocalizedString("headline","Headline");
-    sLocale =  iwrb.getLocalizedString("locale","Locale");
-    sTeaser = iwrb.getLocalizedString("teaser","Teaser");
-    sNews = iwrb.getLocalizedString("news","News");
-    sCategory = iwrb.getLocalizedString("category","Category");
-    sAuthor = iwrb.getLocalizedString("author","Author");
-    sSource = iwrb.getLocalizedString("source","Source");
-    sEditor = iwrb.getLocalizedString("news_editor","News Editor");
-    sPublisFrom = iwrb.getLocalizedString("publish_from","Publish from");
-    sPublisTo = iwrb.getLocalizedString("publish_to","Publish to");
-    sNewsDate = iwrb.getLocalizedString("news_date","News date");
+    this.sHeadline = this.iwrb.getLocalizedString("headline","Headline");
+    this.sLocale =  this.iwrb.getLocalizedString("locale","Locale");
+    this.sTeaser = this.iwrb.getLocalizedString("teaser","Teaser");
+    this.sNews = this.iwrb.getLocalizedString("news","News");
+    this.sCategory = this.iwrb.getLocalizedString("category","Category");
+    this.sAuthor = this.iwrb.getLocalizedString("author","Author");
+    this.sSource = this.iwrb.getLocalizedString("source","Source");
+    this.sEditor = this.iwrb.getLocalizedString("news_editor","News Editor");
+    this.sPublisFrom = this.iwrb.getLocalizedString("publish_from","Publish from");
+    this.sPublisTo = this.iwrb.getLocalizedString("publish_to","Publish to");
+    this.sNewsDate = this.iwrb.getLocalizedString("news_date","News date");
     setAllMargins(0);
-    setTitle(sEditor);
+    setTitle(this.sEditor);
   }
 
   private void control(IWContext iwc)throws Exception{
@@ -143,7 +143,7 @@ private IWResourceBundle iwrb;
 
     String sLocaleId = iwc.getParameter(prmLocale);
     String sCategoryId = iwc.getParameter(prmCategory);
-    iCategoryId = sCategoryId !=null?Integer.parseInt(sCategoryId):-1;
+    this.iCategoryId = sCategoryId !=null?Integer.parseInt(sCategoryId):-1;
     int saveInfo = getSaveInfo(iwc);
 
     // LocaleHandling
@@ -157,7 +157,7 @@ private IWResourceBundle iwrb;
       iLocaleId = ICLocaleBusiness.getLocaleId(chosenLocale);
     }
 
-    if ( isAdmin ) {
+    if ( this.isAdmin ) {
       // end of LocaleHandling
 
       // Text initialization
@@ -165,34 +165,38 @@ private IWResourceBundle iwrb;
       String sLocTextId = iwc.getParameter(prmLocalizedTextId);
       String sObjInstId = iwc.getParameter(prmObjInstId);
       sAttribute = iwc.getParameter(prmAttribute);
-      if(sObjInstId!=null)
-        iObjInsId = Integer.parseInt(sObjInstId);
+      if(sObjInstId!=null) {
+				this.iObjInsId = Integer.parseInt(sObjInstId);
+			}
 
       // News Id Request :
       if(iwc.getParameter(prmNwNewsId) != null){
-        sNewsId = iwc.getParameter(prmNwNewsId);
+        this.sNewsId = iwc.getParameter(prmNwNewsId);
       }
       // Delete Request :
       else if(iwc.getParameter(prmDelete)!=null){
-        sNewsId = iwc.getParameter(prmDelete);
-        confirmDelete(sNewsId,iObjInsId);
+        this.sNewsId = iwc.getParameter(prmDelete);
+        confirmDelete(this.sNewsId,this.iObjInsId);
         doView = false;
       }
       // Object Instance Request :
       else if(sObjInstId!=null){
         //doView = false;
-        if(iObjInsId > 0 && saveInfo != SAVECATEGORY)
-          iCategoryId = CategoryFinder.getInstance().getObjectInstanceCategoryId(iObjInsId );
+        if(this.iObjInsId > 0 && saveInfo != this.SAVECATEGORY) {
+					this.iCategoryId = CategoryFinder.getInstance().getObjectInstanceCategoryId(this.iObjInsId );
+				}
       }
       //add("category id "+iCategoryId);
       //add(" instance id "+iObjInsId);
       // end of News initialization
 
       // Form processing
-      if(saveInfo == SAVENEWS)
-        processForm(iwc,sNewsId,sLocTextId, sCategoryId);
-      else if(saveInfo == SAVECATEGORY)
-        processCategoryForm(iwc,sCategoryId,iObjInsId);
+      if(saveInfo == this.SAVENEWS) {
+				processForm(iwc,this.sNewsId,sLocTextId, sCategoryId);
+			}
+			else if(saveInfo == this.SAVECATEGORY) {
+				processCategoryForm(iwc,sCategoryId,this.iObjInsId);
+			}
 
       /* old stuff
       if(iwc.isParameterSet(prmObjInstId)){
@@ -201,8 +205,9 @@ private IWResourceBundle iwrb;
       */
       //doView = false;
 
-      if(doView)
-        doViewNews(sNewsId,sAttribute,chosenLocale,iLocaleId,iCategoryId );
+      if(doView) {
+				doViewNews(this.sNewsId,sAttribute,chosenLocale,iLocaleId,this.iCategoryId );
+			}
     }
     else {
       noAccess();
@@ -212,11 +217,13 @@ private IWResourceBundle iwrb;
 
   private int getSaveInfo(IWContext iwc){
     if(iwc.getParameter(prmFormProcess)!=null){
-      if(iwc.getParameter(prmFormProcess).equals("Y"))
-        return SAVENEWS;
-      else if(iwc.getParameter(prmFormProcess).equals("C"))
-        return SAVECATEGORY;
+      if(iwc.getParameter(prmFormProcess).equals("Y")) {
+				return this.SAVENEWS;
+			}
+			else if(iwc.getParameter(prmFormProcess).equals("C")) {
+				return this.SAVECATEGORY;
   //doView = false;
+			}
   }
     return 0;
   }
@@ -296,11 +303,12 @@ private IWResourceBundle iwrb;
     if(sNewsId != null){
       int iNewsId = Integer.parseInt(sNewsId);
       news = NewsFinder.getNews(iNewsId);
-      if(news != null && locale != null)
-        contentHelper = ContentFinder.getContentHelper(news.getContentId(),locale);
+      if(news != null && locale != null) {
+				contentHelper = ContentFinder.getContentHelper(news.getContentId(),locale);
+			}
     }
 
-    addNewsFields(news,contentHelper,iLocaleId,iObjInsId,iCategoryId);
+    addNewsFields(news,contentHelper,iLocaleId,this.iObjInsId,iCategoryId);
 
   }
 
@@ -327,7 +335,7 @@ private IWResourceBundle iwrb;
       IWTimestamp today = IWTimestamp.RightNow();
       IWTimestamp pubFrom = sPubFrom!=null ? new IWTimestamp(sPubFrom):today;
       Timestamp newsDate = sNewsDate != null ? new IWTimestamp(sNewsDate).getTimestamp() : null;
-      today.addDays(defaultPublishDays);
+      today.addDays(this.defaultPublishDays);
       IWTimestamp pubTo = sPubTo!=null ?new IWTimestamp(sPubTo):today;
       Vector V = null;
       ICFile F = null;
@@ -345,9 +353,10 @@ private IWResourceBundle iwrb;
 
       //System.err.println(pubFrom.toSQLString());
       //System.err.println(pubTo.toString());
-      NwNews news = NewsBusiness.saveNews(iNwNewsId,iLocalizedTextId,iCategoryId ,sHeadline,sTeaser,sAuthor,sSource,sBody,iLocaleId,iUserId,iObjInsId,pubFrom.getTimestamp(),pubTo.getTimestamp(),V, newsDate);
-      if(news!=null)
-        sNewsId = String.valueOf(news.getID());
+      NwNews news = NewsBusiness.saveNews(iNwNewsId,iLocalizedTextId,iCategoryId ,sHeadline,sTeaser,sAuthor,sSource,sBody,iLocaleId,this.iUserId,this.iObjInsId,pubFrom.getTimestamp(),pubTo.getTimestamp(),V, newsDate);
+      if(news!=null) {
+				this.sNewsId = String.valueOf(news.getID());
+			}
     }
   }
 
@@ -372,7 +381,9 @@ private IWResourceBundle iwrb;
     String values = "";
     for (int i = 0 ; i < attribs.length ; i++) {
       values += ICCategoryBMPBean.getColumnName()+"_id = '"+attribs[i].getNewsCategoryId()+"'" ;
-      if( i!= (attribs.length-1) ) values += " OR ";
+      if( i!= (attribs.length-1) ) {
+				values += " OR ";
+			}
     }
     return values;
   }
@@ -388,8 +399,9 @@ private IWResourceBundle iwrb;
   private void addNewsFields(NwNews nwNews ,ContentHelper contentHelper, int iLocaleId,int iObjInsId,int iCategoryId){
     LocalizedText locText = null;
     boolean hasContent = ( contentHelper != null) ? true:false;
-    if(hasContent)
-      locText = contentHelper.getLocalizedText(ICLocaleBusiness.getLocaleReturnIcelandicLocaleIfNotFound(iLocaleId));
+    if(hasContent) {
+			locText = contentHelper.getLocalizedText(ICLocaleBusiness.getLocaleReturnIcelandicLocaleIfNotFound(iLocaleId));
+		}
     boolean hasNwNews = ( nwNews != null ) ? true: false;
     boolean hasLocalizedText = ( locText != null ) ? true: false;
 
@@ -408,7 +420,7 @@ private IWResourceBundle iwrb;
 		// add default publishing days:
 		int addYears = 0;
 		try {
-			addYears = Integer.parseInt(iwb.getProperty(YEARS_AHEAD_PROPERTY, "0"));
+			addYears = Integer.parseInt(this.iwb.getProperty(YEARS_AHEAD_PROPERTY, "0"));
 		}
 		catch (NullPointerException ne) {
 			addYears = 0;
@@ -466,10 +478,12 @@ private IWResourceBundle iwrb;
       addHiddenInput(new HiddenInput(prmLocalizedTextId,String.valueOf(locText.getID())));
     }
     if( hasNwNews ){
-      if("".equals(nwNews.getAuthor())&& eUser !=null)
-        tiAuthor.setContent(eUser.getFirstName());
-      else
-        tiAuthor.setContent(nwNews.getAuthor());
+      if("".equals(nwNews.getAuthor())&& this.eUser !=null) {
+				tiAuthor.setContent(this.eUser.getFirstName());
+			}
+			else {
+				tiAuthor.setContent(nwNews.getAuthor());
+			}
       tiSource.setContent(nwNews.getSource());
       //drpCategories.setSelectedElement(String.valueOf(nwNews.getNewsCategoryId()));
 
@@ -499,22 +513,24 @@ private IWResourceBundle iwrb;
       //addHiddenInput(new HiddenInput(prmCategory ,String.valueOf(nwNews.getNewsCategoryId())));
     }
     else{
-      if( eUser !=null){
-        tiAuthor.setContent(eUser.getFirstName());
+      if( this.eUser !=null){
+        tiAuthor.setContent(this.eUser.getFirstName());
       }
       IWTimestamp today = IWTimestamp.RightNow();
       publishFrom.setTimestamp(today.getTimestamp());
 
-			if (addYears > 0)
+			if (addYears > 0) {
 				today.addYears(addYears);
-			else
-      	today.addDays(defaultPublishDays);
+			}
+			else {
+				today.addDays(this.defaultPublishDays);
+			}
       publishTo.setTimestamp(today.getTimestamp());
       addHiddenInput(new HiddenInput(prmCategory ,String.valueOf(iCategoryId)));
     }
       addHiddenInput(new HiddenInput(prmObjInstId ,String.valueOf(iObjInsId)));
 
-      SubmitButton addButton = new SubmitButton(core.getImage("/shared/create.gif","Add to news"),prmSaveFile);
+      SubmitButton addButton = new SubmitButton(this.core.getImage("/shared/create.gif","Add to news"),prmSaveFile);
       //SubmitButton leftButton = new SubmitButton(core.getImage("/shared/frew.gif","Insert image"),prmSaveFile);
       ImageInserter imageInsert = new ImageInserter();
       imageInsert.setImSessionImageName(prmImageId);
@@ -537,7 +553,7 @@ private IWResourceBundle iwrb;
       List files = contentHelper.getFiles();
       if(files != null && !files.isEmpty()){
       imageTable.mergeCells(1,row,3,row);
-      imageTable.add( formatText(iwrb.getLocalizedString("newsimages","News images :")),1,row++);
+      imageTable.add( formatText(this.iwrb.getLocalizedString("newsimages","News images :")),1,row++);
       ICFile file1 = (ICFile) files.get(0);
       imageInsert.setImageId(((Integer)file1.getPrimaryKey()).intValue());
 
@@ -551,8 +567,8 @@ private IWResourceBundle iwrb;
 
           imageTable.add(immi,1,row);
           //Link edit = new Link(iwb.getImage("/shared/edit.gif"));
-          Link edit = com.idega.block.image.presentation.ImageAttributeSetter.getLink(iwb.getImage("/shared/edit.gif"),((Integer)file1.getPrimaryKey()).intValue(),imageAttributeKey);
-          Link delete = new Link(core.getImage("/shared/delete.gif"));
+          Link edit = com.idega.block.image.presentation.ImageAttributeSetter.getLink(this.iwb.getImage("/shared/edit.gif"),((Integer)file1.getPrimaryKey()).intValue(),imageAttributeKey);
+          Link delete = new Link(this.core.getImage("/shared/delete.gif"));
           delete.addParameter(prmDeleteFile,f.getPrimaryKey().toString());
           delete.addParameter(prmNwNewsId,nwNews.getID());
           delete.addParameter(getParameterSaveNews());
@@ -567,22 +583,22 @@ private IWResourceBundle iwrb;
       }
     }
 
-    addLeft(sHeadline,tiHeadline,true);
-    addLeft(sLocale, LocaleDrop,true);
-    addLeft(sTeaser,taTeaser,true);
-    addLeft(sNews,taBody,true);
-    addLeft(sNewsDate,newsDate,true);
-    addLeft(sPublisFrom, publishFrom,true);
-    addLeft(sPublisTo,publishTo,true);
+    addLeft(this.sHeadline,tiHeadline,true);
+    addLeft(this.sLocale, LocaleDrop,true);
+    addLeft(this.sTeaser,taTeaser,true);
+    addLeft(this.sNews,taBody,true);
+    addLeft(this.sNewsDate,newsDate,true);
+    addLeft(this.sPublisFrom, publishFrom,true);
+    addLeft(this.sPublisTo,publishTo,true);
 
-    addRight(sCategory,catDrop,true);
-    addRight(sAuthor,tiAuthor,true);
-    addRight(sSource,tiSource,true);
+    addRight(this.sCategory,catDrop,true);
+    addRight(this.sAuthor,tiAuthor,true);
+    addRight(this.sSource,tiSource,true);
     //addRight(iwrb.getLocalizedString("image","Image"),imageInsert,true);
     //if(addButton!=null){
     //addRight("",addButton,true,false);
     //}
-    addRight(iwrb.getLocalizedString("images","Images"),imageTable,true,false);
+    addRight(this.iwrb.getLocalizedString("images","Images"),imageTable,true,false);
 
     /*
     addRight(sImage,imageInsert,true);
@@ -590,8 +606,8 @@ private IWResourceBundle iwrb;
     addRight("props",propslink,true);
     */
 
-    SubmitButton save = new SubmitButton(iwrb.getLocalizedImageButton("save","Save"),actSave);
-    SubmitButton close = new SubmitButton(iwrb.getLocalizedImageButton("close","Close"),actClose);
+    SubmitButton save = new SubmitButton(this.iwrb.getLocalizedImageButton("save","Save"),actSave);
+    SubmitButton close = new SubmitButton(this.iwrb.getLocalizedImageButton("close","Close"),actClose);
     addSubmitButton(save);
     addSubmitButton(close);
 
@@ -603,24 +619,24 @@ private IWResourceBundle iwrb;
     NwNews nwNews = NewsFinder.getNews(iNewsId);
 
     if ( nwNews != null ) {
-      addLeft(iwrb.getLocalizedString("news_to_delete","News to delete"));
-      addLeft(iwrb.getLocalizedString("confirm_delete","Are you sure?"));
+      addLeft(this.iwrb.getLocalizedString("news_to_delete","News to delete"));
+      addLeft(this.iwrb.getLocalizedString("confirm_delete","Are you sure?"));
 
       //addSubmitButton(new SubmitButton(iwrb.getImage("delete.gif"),actDelete));
-      addSubmitButton(new SubmitButton(iwrb.getLocalizedImageButton("delete","Delete"),actDelete));
+      addSubmitButton(new SubmitButton(this.iwrb.getLocalizedImageButton("delete","Delete"),actDelete));
 
       addHiddenInput(new HiddenInput(modeDelete,String.valueOf(nwNews.getID())));
       addHiddenInput( new HiddenInput (prmFormProcess,"Y"));
     }
     else {
-      addLeft(iwrb.getLocalizedString("not_exists","News already deleted or not available."));
+      addLeft(this.iwrb.getLocalizedString("not_exists","News already deleted or not available."));
       //addSubmitButton(new CloseButton(iwrb.getImage("close.gif")));
       addSubmitButton(new CloseButton());
     }
   }
 
   private void noAccess() throws IOException,SQLException {
-    addLeft(iwrb.getLocalizedString("no_access","Login first!"));
+    addLeft(this.iwrb.getLocalizedString("no_access","Login first!"));
     this.addSubmitButton(new CloseButton());
   }
 
@@ -639,13 +655,13 @@ private IWResourceBundle iwrb;
   public void main(IWContext iwc) throws Exception {
     super.main(iwc);
 
-    isAdmin = true;
-    eUser = com.idega.core.accesscontrol.business.LoginBusinessBean.getUser(iwc);
-    iUserId = eUser != null?eUser.getID():-1;
-    iwb = getBundle(iwc);
-    iwrb = getResourceBundle(iwc);
-		core = iwc.getIWMainApplication().getBundle(Builderaware.IW_CORE_BUNDLE_IDENTIFIER);
-    addTitle(iwrb.getLocalizedString("news_editor","News Editor"));
+    this.isAdmin = true;
+    this.eUser = com.idega.core.accesscontrol.business.LoginBusinessBean.getUser(iwc);
+    this.iUserId = this.eUser != null?this.eUser.getID():-1;
+    this.iwb = getBundle(iwc);
+    this.iwrb = getResourceBundle(iwc);
+		this.core = iwc.getIWMainApplication().getBundle(Builderaware.IW_CORE_BUNDLE_IDENTIFIER);
+    addTitle(this.iwrb.getLocalizedString("news_editor","News Editor"));
     control(iwc);
   }
 

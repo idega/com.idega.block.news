@@ -102,8 +102,9 @@ public class NewsFormatter {
         if(showTimeFirst){
           info.insert(0,NewsTime+" ");
         }
-        else
-          info.append(" ");
+				else {
+					info.append(" ");
+				}
           info.append(NewsTime);
       }
       if(!"".equals(sCategory)){
@@ -129,8 +130,9 @@ public class NewsFormatter {
       }
       if(!"".equals(NewsDate)){
         info.append(NewsDate);
-				if(showTime)
-        info.append(spacer);
+				if(showTime) {
+					info.append(spacer);
+				}
       }
 			if(showTime && !showTimeFirst && !"".equals(NewsTime)){
         info.append(NewsTime);

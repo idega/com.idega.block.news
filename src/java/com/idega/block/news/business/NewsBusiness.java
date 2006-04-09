@@ -89,9 +89,9 @@ public class NewsBusiness {
 			return true;
 
 		}
-
-		else
+		else {
 			return false;
+		}
 
 	}
 
@@ -254,22 +254,26 @@ public class NewsBusiness {
 			Content eContent = ContentBusiness.saveContent(eNwNews.getContentId(), iLocalizedTextId, iLocaleId, iUserId, tsPubFrom, tsPubTo, sHeadline, sBody, sTitle, listOfFiles, newsDate);
 			if (eContent != null) {
 
-				if (eContent.getID() > 0)
+				if (eContent.getID() > 0) {
 					eNwNews.setContentId(eContent.getID());
+				}
 
-				if (sAuthor != null)
+				if (sAuthor != null) {
 					eNwNews.setAuthor(sAuthor);
+				}
 
-				if (sSource != null)
+				if (sSource != null) {
 					eNwNews.setSource(sSource);
+				}
 
 				eNwNews.setNewsCategoryId(iCategoryId);
 
-				if (update)
+				if (update) {
 					eNwNews.update();
-
-				else
+				}
+				else {
 					eNwNews.insert();
+				}
 
 				return eNwNews;
 

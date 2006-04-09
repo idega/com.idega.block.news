@@ -256,8 +256,9 @@ public class NewsFinder {
       for (int i = 0; i < len && i < maxNumberOfNews; i++) {
         NwNews news = (NwNews) L.get(i);
         NewsHelper nh = getNewsHelper(news);
-        if(nh != null)
-          V.add(nh);
+        if(nh != null) {
+					V.add(nh);
+				}
       }
      return V;
     }
@@ -286,8 +287,9 @@ public class NewsFinder {
       for (int i = 0; i < len && i < maxNumberOfNews; i++) {
         NwNews news = (NwNews) L.get(i);
         NewsHelper nh = getNewsHelper(news,iLocaleId );
-        if(nh != null)
-          V.add(nh);
+        if(nh != null) {
+					V.add(nh);
+				}
       }
      return V;
     }
@@ -303,8 +305,9 @@ public class NewsFinder {
       NH.setContentHelper(ch);
       return NH;
     }
-    else
-      return null;
+		else {
+			return null;
+		}
   }
 
   public static NewsHelper getNewsHelper(NwNews news,int iLocaleId){
@@ -316,8 +319,9 @@ public class NewsFinder {
       NH.setContentHelper(ch);
       return NH;
     }
-    else
-      return null;
+		else {
+			return null;
+		}
   }
 
   public static NewsHelper getNewsHelper(int iNwNewsId){
@@ -340,8 +344,9 @@ public class NewsFinder {
       NH.setContentHelper(ch);
       return NH;
     }
-    else
-      return null;
+		else {
+			return null;
+		}
   }
 
   public static List listOfNewsFiles(int id){
@@ -468,8 +473,9 @@ public class NewsFinder {
 
   public static Locale getLocale(int iLocaleId){
     Locale L = ICLocaleBusiness.getLocale(iLocaleId);
-    if(L==null)
-      L = new Locale("is","IS");
+    if(L==null) {
+			L = new Locale("is","IS");
+		}
     return L;
   }
 
