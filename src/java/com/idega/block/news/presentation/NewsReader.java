@@ -1,5 +1,5 @@
 /*
- * $Id: NewsReader.java,v 1.145 2006/04/09 11:56:46 laddi Exp $
+ * $Id: NewsReader.java,v 1.141.2.1 2006/04/18 22:02:01 sigtryggur Exp $
  *
  * Copyright (C) 2001 Idega hf. All Rights Reserved.
  *
@@ -30,6 +30,7 @@ import com.idega.block.text.business.ContentHelper;
 import com.idega.block.text.data.Content;
 import com.idega.block.text.data.LocalizedText;
 import com.idega.core.file.data.ICFile;
+import com.idega.core.user.data.User;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.idegaweb.block.presentation.Builderaware;
@@ -58,7 +59,14 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 	public final static String CACHE_KEY = "nw_news";
 	private boolean hasEdit = false, hasAdd = false, hasInfo = false, hasEditExisting = false;
 	private int iCategoryId = -1;
+	private String attributeName = null;
+	private int attributeId = -1;
+	private User eUser = null;
+
 	private boolean showNewsCollectionButton = false;
+	private int categoryId = 0;
+
+	private Table outerTable = new Table(1, 1);
 
 	private int numberOfLetters = 273;
 	private int numberOfHeadlineLetters = -1;
@@ -72,6 +80,7 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 	private int cellSpacing = 0;
 	private int viewPageId = -1;
 	private int textSize = 2;
+	private int firstImageWidth = 200;
 	private int ImageWidth = 100;
 	private int ImageBorder = 1;
 	private int dateWidth = 60;
@@ -116,8 +125,13 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 	private Image spacerImage = null;
 
 	private static String prmFromPage = "nwr_from_page";
+	private static String prmDelete = "nwr_delete";
+	private static String prmEdit = "nwr_edit";
+	private static String prmNew = "nwr_new";
 	private static String prmMore = "nwr_more";
 	private static String prmCollection = "nwr_collection";
+	private static String prmObjIns = "nwr_instance_id";
+
 	public static String prmListCategory = "nwr_newscategoryid";
 	public static String prmNewsCategoryId = "nwr_listcategory";
 
@@ -135,7 +149,6 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 	public static final int COLLECTION_LAYOUT = NewsLayoutHandler.COLLECTION_LAYOUT;
 
 	private int iLayout = SINGLE_FILE_LAYOUT;
-	private int newsCount = 0;
 
 	private int visibleNewsRangeStart = 0;
 	private int visibleNewsRangeEnd = Integer.MAX_VALUE;
@@ -149,7 +162,7 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 	public NewsReader() {
 		setCacheable(getCacheKey(), 999999999);//cache indefinately
 		init();
-		this.showAll = true;
+		showAll = true;
 	}
 
 	public NewsReader(int iCategoryId) {
@@ -173,20 +186,22 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 	}
 
 	private void init() {
-		this.headlineProxy.setBold();
-		this.informationProxy.setFontColor("#666666");
-		this.textProxy.setFontSize(1);
-		this.informationProxy.setFontSize(1);
+		headlineProxy.setBold();
+		informationProxy.setFontColor("#666666");
+		textProxy.setFontSize(1);
+		informationProxy.setFontSize(1);
+	}
+
+	private void checkCategories() {
+
 	}
 
 	/** @todo take out when instanceId handler is used */
 	private String getInstanceIDString(IWContext iwc) {
-		if (this.viewPageId > 0 || iwc.isParameterSet(prmFromPage)) {
+		if (viewPageId > 0 || iwc.isParameterSet(prmFromPage))
 			return "";
-		}
-		else {
+		else
 			return String.valueOf(getICObjectInstanceID());
-		}
 	}
 
 	private Parameter getFromPageParameter() {
@@ -194,33 +209,25 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 	}
 
 	private void checkFromPage(Link link) {
-		if (this.viewPageId > 0) {
-			link.addParameter(getFromPageParameter());
-		}
+		if (viewPageId > 0) link.addParameter(getFromPageParameter());
 	}
 
 	private void control(IWContext iwc) {
 
-		if (this.moreImage == null) {
-			this.moreImage = this.iwrb.getImage("more.gif");
-		}
-		if (this.backImage == null) {
-			this.backImage = this.iwrb.getImage("back.gif");
-		}
-		if (this.collectionImage == null) {
-			this.collectionImage = this.iwrb.getImage("collection.gif");
-		}
+		if (moreImage == null) moreImage = iwrb.getImage("more.gif");
+		if (backImage == null) backImage = iwrb.getImage("back.gif");
+		if (collectionImage == null) collectionImage = iwrb.getImage("collection.gif");
 
 		Locale locale = iwc.getCurrentLocale();
 		String sNewsId = null;
 		boolean beInvisible = false;
-		if (this.viewNews) {
-			if(this.visibleNewsRangeStart>0) {
+		if (viewNews) {
+			if(visibleNewsRangeStart>0) {
 				Enumeration enumer = iwc.getParameterNames();
 				while (enumer.hasMoreElements()) {
 					String pName = (String) enumer.nextElement();
 					if(pName.startsWith(prmMore)) {
-						if(this.visibleNewsRangeStart==1) {
+						if(visibleNewsRangeStart==1) {
 							sNewsId = iwc.getParameter(pName);
 						} else {
 							beInvisible=true;
@@ -238,26 +245,23 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 			String prm = prmListCategory + getInstanceIDString(iwc);
 			boolean info = false;
 			if (iwc.isParameterSet(prm)) {
-				if (iwc.getParameter(prm).equalsIgnoreCase("true")) {
+				if (iwc.getParameter(prm).equalsIgnoreCase("true"))
 					info = true;
-				}
-				else {
+				else
 					info = false;
-				}
 			}
 	
-			if (this.iCategoryId <= 0) {
+			if (iCategoryId <= 0) {
 				String sCategoryId = iwc.getParameter(prmNewsCategoryId);
-				if (sCategoryId != null) {
-					this.iCategoryId = Integer.parseInt(sCategoryId);
-				}
+				if (sCategoryId != null)
+					iCategoryId = Integer.parseInt(sCategoryId);
 				else {
 					//if(getICObjectInstanceID() > 0){
 					//		  iCategoryId =
 					// NewsFinder.getObjectInstanceCategoryId(getICObjectInstanceID(),true);
-					this.iCategoryId = getCategoryId();
-					if (this.iCategoryId <= 0) {
-						this.newobjinst = true;
+					iCategoryId = getCategoryId();
+					if (iCategoryId <= 0) {
+						newobjinst = true;
 					}
 				}
 			}
@@ -265,11 +269,11 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 			T.setCellpadding(0);
 			T.setCellpadding(0);
 			T.setWidth("100%");
-			if (this.hasEdit || this.hasAdd || this.hasInfo) {
-				T.add(getAdminPart(this.iCategoryId, false, this.newobjinst, info, iwc), 1, 1);
+			if (hasEdit || hasAdd || hasInfo) {
+				T.add(getAdminPart(iCategoryId, false, newobjinst, info, iwc), 1, 1);
 			}
-			if (this.iCategoryId > 0) {
-				newsCategory = CategoryFinder.getInstance().getCategory(this.iCategoryId);
+			if (iCategoryId > 0) {
+				newsCategory = CategoryFinder.getInstance().getCategory(iCategoryId);
 				if (newsCategory != null) {
 					if (sNewsId != null) {
 						int id = Integer.parseInt(sNewsId);
@@ -286,7 +290,7 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 				}
 			}
 			else {
-				T.add(new Text(this.iwrb.getLocalizedString("no_news_category", "No news category")));
+				T.add(new Text(iwrb.getLocalizedString("no_news_category", "No news category")));
 			}
 			super.add(T);
 		}
@@ -300,7 +304,7 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 
 		IWBundle core = iwc.getIWMainApplication().getBundle(IW_CORE_BUNDLE_IDENTIFIER);
 		if (iCategoryId > 0) {
-			if (this.hasEdit || this.hasAdd || this.hasInfo) {
+			if (hasEdit || hasAdd || hasInfo) {
 				Link ne = new Link(core.getImage("/shared/create.gif"));
 				ne.setWindowToOpen(NewsEditorWindow.class);
 				ne.addParameter(NewsEditorWindow.prmCategory, iCategoryId);
@@ -308,33 +312,31 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 				T.add(ne, 1, 1);
 			}
 			//T.add(T.getTransparentCell(iwc),1,1);
-			if (this.hasEdit || this.hasInfo) {
-				Link list = new Link(this.iwb.getImage("/shared/info.gif"));
+			if (hasEdit || hasInfo) {
+				Link list = new Link(iwb.getImage("/shared/info.gif"));
 				checkFromPage(list);
-				if (!info) {
+				if (!info)
 					list.addParameter(prmListCategory + getInstanceIDString(iwc), "true");
-				}
-				else {
+				else
 					list.addParameter(prmListCategory + getInstanceIDString(iwc), "false");
-				}
 				T.add(list, 1, 1);
 			}
 
-			if (this.hasEdit) {
+			if (hasEdit) {
 				Link change = getCategoryLink();
 				change.setImage(core.getImage("/shared/detach.gif"));
 				T.add(change, 1, 1);
 			}
 
-			if (this.hasEdit && enableDelete) {
-				T.add(Table.getTransparentCell(iwc), 1, 1);
+			if (hasEdit && enableDelete) {
+				T.add(T.getTransparentCell(iwc), 1, 1);
 				Link delete = new Link(core.getImage("/shared/delete.gif"));
 				delete.setWindowToOpen(NewsEditorWindow.class);
 				delete.addParameter(NewsEditorWindow.prmDelete, iCategoryId);
 				T.add(delete, 3, 1);
 			}
 		}
-		if (this.hasEdit && newObjInst) {
+		if (hasEdit && newObjInst) {
 			Link newLink = getCategoryLink();
 			newLink.setImage(core.getImage("/shared/detach.gif"));
 			//Link newLink = new Link(core.getImage("/shared/create.gif"));
@@ -376,7 +378,7 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 		ContentHelper contentHelper = newsHelper.getContentHelper();
 		NwNews news = newsHelper.getNwNews();
 		LocalizedText locText = contentHelper.getLocalizedText(locale);
-		Text newsInfo = getInfoText(news, newsHelper.getContentHelper().getContent(), locale, this.showOnlyDates, this.showTime, this.showTimeFirst, this.showUpdatedDate);
+		Text newsInfo = getInfoText(news, newsHelper.getContentHelper().getContent(), locale, showOnlyDates, showTime, showTimeFirst, showUpdatedDate);
 
 		String sNewsBody = "";
 		String sHeadline = "";
@@ -394,12 +396,12 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 			fileCount = files.size();
 		}
 
-		Text hLetters = formatText(this.iwrb.getLocalizedString("letters", "Letters") + " : ", true);
-		Text hFiles = formatText(this.iwrb.getLocalizedString("files", "Files") + " : ", true);
-		Text hFrom = formatText(this.iwrb.getLocalizedString("publish_from", "Publish from") + " : ", true);
-		Text hTo = formatText(this.iwrb.getLocalizedString("publish_to", "Publish to") + " : ", true);
-		Text hCreated = formatText(this.iwrb.getLocalizedString("created", "Created") + " : ", true);
-		Text hUpdated = formatText(this.iwrb.getLocalizedString("updated", "Updated") + " : ", true);
+		Text hLetters = formatText(iwrb.getLocalizedString("letters", "Letters") + " : ", true);
+		Text hFiles = formatText(iwrb.getLocalizedString("files", "Files") + " : ", true);
+		Text hFrom = formatText(iwrb.getLocalizedString("publish_from", "Publish from") + " : ", true);
+		Text hTo = formatText(iwrb.getLocalizedString("publish_to", "Publish to") + " : ", true);
+		Text hCreated = formatText(iwrb.getLocalizedString("created", "Created") + " : ", true);
+		Text hUpdated = formatText(iwrb.getLocalizedString("updated", "Updated") + " : ", true);
 		Text tLetters = formatText(String.valueOf(letterCount), false);
 		Text tFiles = formatText(String.valueOf(fileCount), false);
 
@@ -409,10 +411,10 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 		IWTimestamp created = new IWTimestamp(newsHelper.getContentHelper().getContent().getCreated());
 		IWTimestamp updated = new IWTimestamp(newsHelper.getContentHelper().getContent().getLastUpdated());
 
-		Text tFrom = formatText(df.format(from.getTimestamp()), true);
-		Text tTo = formatText(df.format(to.getTimestamp()), true);
-		Text tCreated = formatText(df.format(created.getTimestamp()), false);
-		Text tUpdated = formatText(df.format(updated.getTimestamp()), false);
+		Text tFrom = formatText(df.format((java.util.Date) from.getTimestamp()), true);
+		Text tTo = formatText(df.format((java.util.Date) to.getTimestamp()), true);
+		Text tCreated = formatText(df.format((java.util.Date) created.getTimestamp()), false);
+		Text tUpdated = formatText(df.format((java.util.Date) updated.getTimestamp()), false);
 
 		// Unpublished
 		if (from.isLaterThan(now)) {
@@ -431,9 +433,7 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 		}
 
 		Text headLine = new Text(sHeadline);
-		if (newsInfo != null) {
-			newsInfo = setInformationAttributes(newsInfo);
-		}
+		if (newsInfo != null) newsInfo = setInformationAttributes(newsInfo);
 		headLine = setHeadlineAttributes(headLine);
 
 		Table infoTable = new Table();
@@ -451,26 +451,24 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 		infoTable.add(tUpdated, 6, 2);
 
 		int row = 1;
-		if (this.showInfo) {
-			T.add(newsInfo, 1, row++);
-		}
+		if (showInfo) T.add(newsInfo, 1, row++);
 		T.add(headLine, 1, row++);
 		T.add(infoTable, 1, row++);
 
-		T.setHeight(row++, String.valueOf(this.iSpaceBetweenNewsAndBody));
+		T.setHeight(row++, String.valueOf(iSpaceBetweenNewsAndBody));
 
-		if (this.showMoreButton) {
-			T.add(getMoreLink(this.moreImage, news.getID(), iwc), 1, row);
+		if (showMoreButton) {
+			T.add(getMoreLink(moreImage, news.getID(), iwc), 1, row);
 			T.add(Text.getNonBrakingSpace(), 1, row);
 		}
-		if (this.showMoreText) {
-			Text tMore = new Text(this.iwrb.getLocalizedString("more", "More"));
+		if (showMoreText) {
+			Text tMore = new Text(iwrb.getLocalizedString("more", "More"));
 			tMore = setMoreAttributes(tMore);
 			T.add(getMoreLink(tMore, news.getID(), iwc), 1, row);
 		}
 		row++;
 		int ownerId = newsHelper.getContentHelper().getContent().getUserId();
-		if (this.hasEdit || this.hasEditExisting || (this.hasAdd && (ownerId == iwc.getUserId()))) {
+		if (hasEdit || hasEditExisting || (hasAdd && (ownerId == iwc.getUserId()))) {
 			T.add(getNewsAdminPart(news, iwc), 1, row);
 		}
 		return T;
@@ -485,39 +483,37 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 
 	private PresentationObject publishNews(IWContext iwc, Locale locale, boolean collection) {
 		List L = null;
-		if (this.iLayout == COLLECTION_LAYOUT || collection) {
-			L = NewsFinder.listOfAllNewsHelpersInCategory(getCategoryIds(), this.numberOfCollectionNews, locale);
+		if (iLayout == COLLECTION_LAYOUT || collection) {
+			L = NewsFinder.listOfAllNewsHelpersInCategory(getCategoryIds(), numberOfCollectionNews, locale);
 		}
 		else {
-			L = NewsFinder.listOfNewsHelpersInCategory(getCategoryIds(), this.numberOfDisplayedNews, locale);
+			L = NewsFinder.listOfNewsHelpersInCategory(getCategoryIds(), numberOfDisplayedNews, locale);
 		}
-		NewsTable T = new NewsTable(NewsTable.NEWS_SITE_LAYOUT, this.cellPadding, this.cellSpacing, this.firstTableColor, this.secondTableColor);
+		NewsTable T = new NewsTable(NewsTable.NEWS_SITE_LAYOUT, cellPadding, cellSpacing, firstTableColor, secondTableColor);
 
 		//int count = NewsFinder.countNewsInCategory(newsCategory.getID());
 		//System.err.println(" news count "+count);
-		boolean useDividedTable = this.iLayout == NEWS_SITE_LAYOUT ? true : false;
+		boolean useDividedTable = iLayout == NEWS_SITE_LAYOUT ? true : false;
 		if (L != null) {
-			int len = Math.min(this.visibleNewsRangeEnd, L.size());
+			int len = Math.min(visibleNewsRangeEnd, L.size());
 			Integer I;
 			NewsHelper newsHelper;
-			for (int i = Math.max(0, (this.visibleNewsRangeStart - 1)); i < len; i++) {
-				if (this.numberOfExpandedNews == i) {
-					collection = true; // show the rest as
-				}
+			for (int i = Math.max(0, (visibleNewsRangeStart - 1)); i < len; i++) {
+				if (numberOfExpandedNews == i) collection = true; // show the rest as
 																													// collection
 				newsHelper = (NewsHelper) L.get(i);
 				I = new Integer(i);
-				if (this.objectsBetween != null && this.objectsBetween.containsKey(I)) {
+				if (objectsBetween != null && objectsBetween.containsKey(I)) {
 					Table t = new Table(1, 1);
 					t.setCellpadding(4);
-					t.add((PresentationObject) this.objectsBetween.get(I));
-					T.add(t, this.sObjectAlign);
-					this.objectsBetween.remove(I);
+					t.add((PresentationObject) objectsBetween.get(I));
+					T.add(t, sObjectAlign);
+					objectsBetween.remove(I);
 				}
 				T.add(getNewsTable(newsHelper, locale, false, collection, iwc, (i + 1) == len), useDividedTable, "left");
 			}
 			// news collection
-			if (this.showNewsCollectionButton) {
+			if (showNewsCollectionButton) {
 				if (!collection) {
 					// adds collectionButton only if one category bound to instance:
 					//if(getCategoryIds().length == 1)
@@ -531,18 +527,18 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 				}
 			}
 			// Finish objectsbetween
-			if (this.objectsBetween != null && this.objectsBetween.size() > 0) {
-				Vector V = new Vector(this.objectsBetween.values());
+			if (objectsBetween != null && objectsBetween.size() > 0) {
+				Vector V = new Vector(objectsBetween.values());
 				Collections.reverse(V);
 				Iterator iter = V.iterator();
 				while (iter.hasNext()) {
-					T.add((PresentationObject) iter.next(), this.sObjectAlign);
+					T.add((PresentationObject) iter.next(), sObjectAlign);
 				}
 			}
 		}
 		else {
-			if (this.hasEdit || this.hasInfo) {
-				T.add(new Text(this.iwrb.getLocalizedString("no_news", "No News")));
+			if (hasEdit || hasInfo) {
+				T.add(new Text(iwrb.getLocalizedString("no_news", "No News")));
 			}
 		}
 		return (T);
@@ -552,16 +548,16 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 		Table smallTable = new Table(1, 1);
 		smallTable.setCellpadding(0);
 		smallTable.setCellspacing(0);
-		if(this.CollectionLinkStyleClass != null){
-				Text collText = new Text(this.iwrb.getLocalizedString("collection", "Collection"));
-				collText.setStyleClass(this.CollectionLinkStyleClass);
+		if(CollectionLinkStyleClass != null){
+				Text collText = new Text(iwrb.getLocalizedString("collection", "Collection"));
+				collText.setStyleClass(CollectionLinkStyleClass);
 				smallTable.add(getCollectionLink(collText, iCollectionCategoryId, iwc), 1, 1);
 		} else {
-			if (this.collectionImage != null) {
-				smallTable.add(getCollectionLink(this.collectionImage, iCollectionCategoryId, iwc), 1, 1);
+			if (collectionImage != null) {
+				smallTable.add(getCollectionLink(collectionImage, iCollectionCategoryId, iwc), 1, 1);
 			}
-			if (this.showCollectionText) {
-				Text collText = new Text(this.iwrb.getLocalizedString("collection", "Collection"));
+			if (showCollectionText) {
+				Text collText = new Text(iwrb.getLocalizedString("collection", "Collection"));
 				collText = setInformationAttributes(collText);
 				smallTable.add(getCollectionLink(collText, iCollectionCategoryId, iwc), 1, 1);
 			}
@@ -573,12 +569,12 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 		Table smallTable = new Table(1, 1);
 		smallTable.setCellpadding(0);
 		smallTable.setCellspacing(0);
-		if (this.showBackButton) {
-			smallTable.add(getBackLink(this.backImage), 1, 1);
+		if (showBackButton) {
+			smallTable.add(getBackLink(backImage), 1, 1);
 			smallTable.add(Text.getNonBrakingSpace(), 1, 1);
 		}
-		if (this.showBackText) {
-			Text tBack = new Text(this.iwrb.getLocalizedString("back", "Back"));
+		if (showBackText) {
+			Text tBack = new Text(iwrb.getLocalizedString("back", "Back"));
 			tBack = setMoreAttributes(tBack);
 			smallTable.add(getBackLink(tBack), 1, 1);
 		}
@@ -591,9 +587,7 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 		checkFromPage(collectionLink);
 		collectionLink.addParameter(prmNewsCategoryId, iCategoryId);
 		collectionLink.addParameter(prmCollection + getInstanceIDString(iwc), "true");
-		if (this.viewPageId > 0) {
-			collectionLink.setPage(this.viewPageId);
-		}
+		if (viewPageId > 0) collectionLink.setPage(viewPageId);
 		return collectionLink;
 	}
 
@@ -614,9 +608,7 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 		NwNews news = newsHelper.getNwNews();
 		LocalizedText locText = contentHelper.getLocalizedText(locale);
 
-		if (this.iLayout == SINGLE_LINE_LAYOUT) {
-			this.showOnlyDates = true;
-		}
+		if (iLayout == SINGLE_LINE_LAYOUT) showOnlyDates = true;
 
 		String sNewsBody = "";
 		String sHeadline = "";
@@ -630,23 +622,21 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 		}
 		// shortening headlinestext
 		boolean needMoreButton = collection;
-		if (!showAll && this.numberOfHeadlineLetters > -1 && sHeadline.length() >= this.numberOfHeadlineLetters) {
-			sHeadline = sHeadline.substring(0, this.numberOfHeadlineLetters) + "...";
+		if (!showAll && numberOfHeadlineLetters > -1 && sHeadline.length() >= numberOfHeadlineLetters) {
+			sHeadline = sHeadline.substring(0, numberOfHeadlineLetters) + "...";
 			needMoreButton = true;
 		}
 
 		Text headLine = new Text(sHeadline);
 		Text teaser = new Text(sTeaser);
 
-		Text newsInfo = getInfoText(news, newsHelper.getContentHelper().getContent(), locale, this.showOnlyDates, this.showTime, this.showTimeFirst, this.showUpdatedDate);
-		if (newsInfo != null) {
-			newsInfo = setInformationAttributes(newsInfo);
-		}
+		Text newsInfo = getInfoText(news, newsHelper.getContentHelper().getContent(), locale, showOnlyDates, showTime, showTimeFirst, showUpdatedDate);
+		if (newsInfo != null) newsInfo = setInformationAttributes(newsInfo);
 		headLine = setHeadlineAttributes(headLine);
 		teaser = setTextAttributes(teaser);
 
 		// Check if using single_line_layout
-		if (this.iLayout != SINGLE_LINE_LAYOUT) {
+		if (iLayout != SINGLE_LINE_LAYOUT) {
 			if (newsInfo != null) {
 				T.add(newsInfo, 1, row);
 				T.setVerticalAlignment(1, row, Table.VERTICAL_ALIGN_TOP);
@@ -655,18 +645,16 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 
 			//////// HEADLINE PART ////////////////
 
-			if (this.alignWithHeadline) {
-				if (this.headlineImage != null) {
-					this.headlineImage.setHorizontalSpacing(3);
-					T.add(getMoreLink(this.headlineImage, news.getID(), iwc), 1, row);
+			if (alignWithHeadline) {
+				if (headlineImage != null) {
+					headlineImage.setHorizontalSpacing(3);
+					T.add(getMoreLink(headlineImage, news.getID(), iwc), 1, row);
 				}
-				if (this.headlineImageURL != null) {
-					T.add(getMoreLink(this.iwb.getImage(this.headlineImageURL), news.getID(), iwc), 1, row);
-				}
+				if (headlineImageURL != null) T.add(getMoreLink(iwb.getImage(headlineImageURL), news.getID(), iwc), 1, row);
 			}
 
-			if (this.headlineAsLink) {
-				if (this.setHeadlineLinktToCategoryMainViewerPage) {
+			if (headlineAsLink) {
+				if (setHeadlineLinktToCategoryMainViewerPage) {
 					T.add(getLinkToCategoryMainViewerPage(headLine, news, iwc), 1, row);
 				}
 				else {
@@ -677,12 +665,12 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 				T.add(headLine, 1, row);
 			}
 			row++;
-			if (this.iSpaceBetweenNewsAndBody > 0) {
-				T.setHeight(row++, String.valueOf(this.iSpaceBetweenNewsAndBody));
+			if (iSpaceBetweenNewsAndBody > 0) {
+				T.setHeight(row++, String.valueOf(iSpaceBetweenNewsAndBody));
 			}
 			/////////// BODY PART //////////
-			if (this.showTeaserText && sTeaser.length() > 0 && !showAll) {
-				if (this.showImages && this.showImagesInOverview) {
+			if (showTeaserText && sTeaser.length() > 0 && !showAll) {
+				if (showImages && showImagesInOverview) {
 					T.add(getNewsImage(newsHelper, sHeadline), 1, row);
 					//if (news.getImageId()!= -1 && showImages &&
 					// news.getIncludeImage()){
@@ -692,13 +680,12 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 			}
 			else if (locText != null && !collection) {
 				// counting news
-				this.newsCount++;
 				sNewsBody = locText.getBody();
 				sNewsBody = sNewsBody == null ? "" : sNewsBody;
 
 				// shortening newstext
-				if (!showAll && sNewsBody.length() >= this.numberOfLetters) {
-					sNewsBody = sNewsBody.substring(0, this.numberOfLetters) + "...";
+				if (!showAll && sNewsBody.length() >= numberOfLetters) {
+					sNewsBody = sNewsBody.substring(0, numberOfLetters) + "...";
 					needMoreButton = true;
 				}
 
@@ -708,15 +695,12 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 				newsBody = setTextAttributes(newsBody);
 
 				//////////// IMAGE PART ///////////
-				if (this.showImages) {
-					if (!showAll && this.showImagesInOverview) {
+				if (showImages) {
+					if (!showAll && showImagesInOverview)
 						T.add(getNewsImage(newsHelper, sHeadline), 1, row);
-					}
-					else if (showAll) {
-						T.add(getNewsImage(newsHelper, sHeadline), 1, row);
-						//if (news.getImageId()!= -1 && showImages &&
-						// news.getIncludeImage()){
-					}
+					else if (showAll) T.add(getNewsImage(newsHelper, sHeadline), 1, row);
+					//if (news.getImageId()!= -1 && showImages &&
+					// news.getIncludeImage()){
 				}
 
 				T.add(newsBody, 1, row++);
@@ -725,15 +709,15 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 			///////// BACK LINK ////////////////
 
 			if (showAll) {
-				if (this.iSpaceBetweenNewsAndBody > 0) {
-					T.setHeight(row++, String.valueOf(this.iSpaceBetweenNewsAndBody));
+				if (iSpaceBetweenNewsAndBody > 0) {
+					T.setHeight(row++, String.valueOf(iSpaceBetweenNewsAndBody));
 				}
-				if (this.showBackButton) {
-					T.add(getBackLink(this.backImage), 1, row);
+				if (showBackButton) {
+					T.add(getBackLink(backImage), 1, row);
 					T.add(Text.getNonBrakingSpace(), 1, row);
 				}
-				if (this.showBackText) {
-					Text tBack = new Text(this.iwrb.getLocalizedString("back", "Back"));
+				if (showBackText) {
+					Text tBack = new Text(iwrb.getLocalizedString("back", "Back"));
 					tBack = setMoreAttributes(tBack);
 					T.add(getBackLink(tBack), 1, row);
 				}
@@ -742,15 +726,15 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 			////////// MORE LINK ///////////////
 
 			if (!showAll && needMoreButton) {
-				if (this.iSpaceBetweenNewsAndBody > 0) {
-					T.setHeight(row++, String.valueOf(this.iSpaceBetweenNewsAndBody));
+				if (iSpaceBetweenNewsAndBody > 0) {
+					T.setHeight(row++, String.valueOf(iSpaceBetweenNewsAndBody));
 				}
-				if (this.showMoreButton) {
-					T.add(getMoreLink(this.moreImage, news.getID(), iwc), 1, row);
+				if (showMoreButton) {
+					T.add(getMoreLink(moreImage, news.getID(), iwc), 1, row);
 					T.add(Text.getNonBrakingSpace(), 1, row);
 				}
-				if (this.showMoreText) {
-					Text tMore = new Text(this.iwrb.getLocalizedString("more", "More"));
+				if (showMoreText) {
+					Text tMore = new Text(iwrb.getLocalizedString("more", "More"));
 					tMore = setMoreAttributes(tMore);
 					T.add(getMoreLink(tMore, news.getID(), iwc), 1, row);
 				}
@@ -759,12 +743,12 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 
 			//////////// ADMIN PART /////////////////////
 			int ownerId = newsHelper.getContentHelper().getContent().getUserId();
-			if (this.hasEdit || this.hasEditExisting || (this.hasAdd && (ownerId == iwc.getUserId()))) {
+			if (hasEdit || hasEditExisting || (hasAdd && (ownerId == iwc.getUserId()))) {
 				T.add(getNewsAdminPart(news, iwc), 1, row++);
 			}
 			if (!isLastNews) {
-				if (this.iSpaceBetweenNews > 0) {
-					T.setHeight(row++, String.valueOf(this.iSpaceBetweenNews));
+				if (iSpaceBetweenNews > 0) {
+					T.setHeight(row++, String.valueOf(iSpaceBetweenNews));
 				}
 			}
 		}
@@ -773,39 +757,37 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 		else {
 			int headlineCol = 3;
 			int dateCol = 1;
-			if (this.dateAlign.toLowerCase().equals("right")) {
+			if (dateAlign.toLowerCase().equals("right")) {
 				headlineCol = 1;
 				dateCol = 3;
 			}
 
-			if (this.alignWithHeadline) {
-				if (this.headlineImage != null) {
-					this.headlineImage.setHorizontalSpacing(3);
-					T.add(this.headlineImage, dateCol, 1);
+			if (alignWithHeadline) {
+				if (headlineImage != null) {
+					headlineImage.setHorizontalSpacing(3);
+					T.add(headlineImage, dateCol, 1);
 				}
-				if (this.headlineImageURL != null) {
-					T.add(this.iwb.getImage(this.headlineImageURL), dateCol, 1);
-				}
+				if (headlineImageURL != null) T.add(iwb.getImage(headlineImageURL), dateCol, 1);
 			}
 
-			if (this.showInfo) {
-				T.setWidth(dateCol, 1, this.dateWidth);
+			if (showInfo) {
+				T.setWidth(dateCol, 1, dateWidth);
 				T.setVerticalAlignment(dateCol, 1, Table.VERTICAL_ALIGN_TOP);
 				T.add(newsInfo, dateCol, 1);
 			}
-			if (this.spacerImage == null) {
-				this.spacerImage = Table.getTransparentCell(iwc);
-				this.spacerImage.setWidth(this.iSpaceBetweenNewsAndBody);
-				this.spacerImage.setHeight(1);
+			if (spacerImage == null) {
+				spacerImage = T.getTransparentCell(iwc);
+				spacerImage.setWidth(iSpaceBetweenNewsAndBody);
+				spacerImage.setHeight(1);
 			}
 			T.setAlignment(headlineCol, 1, "left");
 			T.setAlignment(4, 1, "right");
 			T.setWidth(headlineCol, 1, "100%");
 			T.setWidth(dateCol, 1, "45");
-			T.add(this.spacerImage, 2, 1);
+			T.add(spacerImage, 2, 1);
 			//T.add(Text.getNonBrakingSpace(2),2,1);
-			if (this.headlineAsLink) {
-				if (this.setHeadlineLinktToCategoryMainViewerPage) {
+			if (headlineAsLink) {
+				if (setHeadlineLinktToCategoryMainViewerPage) {
 					T.add(getLinkToCategoryMainViewerPage(headLine, news, iwc), headlineCol, 1);
 				}
 				else {
@@ -816,11 +798,11 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 				T.add(headLine, headlineCol, 1);
 			}
 			int ownerId = newsHelper.getContentHelper().getContent().getUserId();
-			if (this.hasEdit || this.hasEditExisting || (this.hasAdd && (ownerId == iwc.getUserId()))) {
+			if (hasEdit || hasEditExisting || (hasAdd && (ownerId == iwc.getUserId()))) {
 				T.add(getNewsAdminPart(news, iwc), 4, 1);
 			}
-			if (this.iSpaceBetweenNews > 0 && !isLastNews) {
-				T.setHeight(2, this.iSpaceBetweenNews);
+			if (iSpaceBetweenNews > 0 && !isLastNews) {
+				T.setHeight(2, iSpaceBetweenNews);
 			}
 		}
 		//T.setBorder(1);
@@ -829,16 +811,14 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 
 	private Link getMoreLink(PresentationObject obj, int newsId, IWContext iwc) {
 		Link moreLink = new Link(obj);
-		if(this.moreStyleClass != null){
-			moreLink.setStyle(this.moreStyleClass);
-		} else if (this.moreAndBackStyleClass != null) {
-			moreLink.setStyle(this.moreAndBackStyleClass);
+		if(moreStyleClass != null){
+			moreLink.setStyle(moreStyleClass);
+		} else if (moreAndBackStyleClass != null) {
+			moreLink.setStyle(moreAndBackStyleClass);
 		}
 		checkFromPage(moreLink);
 		moreLink.addParameter(prmMore + getInstanceIDString(iwc), newsId);
-		if (this.viewPageId > 0) {
-			moreLink.setPage(this.viewPageId);
-		}
+		if (viewPageId > 0) moreLink.setPage(viewPageId);
 		return moreLink;
 	}
 
@@ -870,10 +850,10 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 
 	private Link getBackLink(PresentationObject obj) {
 		Link backLink = new Link(obj);
-		if(this.backStyleClass != null){
-			backLink.setStyle(this.backStyleClass);
-		} else if (this.moreAndBackStyleClass != null) {
-			backLink.setStyle(this.moreAndBackStyleClass);
+		if(backStyleClass != null){
+			backLink.setStyle(backStyleClass);
+		} else if (moreAndBackStyleClass != null) {
+			backLink.setStyle(moreAndBackStyleClass);
 		}
 		backLink.setAsBackLink(1);
 		return backLink;
@@ -881,12 +861,12 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 
 	private PresentationObject getNewsAdminPart(NwNews news, IWContext iwc) {
 		Table links = new Table(3, 1);
-		Link newsEdit = new Link(this.iwb.getImage("/shared/edit.gif"));
+		Link newsEdit = new Link(iwb.getImage("/shared/edit.gif"));
 		newsEdit.setWindowToOpen(NewsEditorWindow.class);
 		newsEdit.addParameter(NewsEditorWindow.prmNwNewsId, news.getID());
 		newsEdit.addParameter(NewsEditorWindow.prmObjInstId, getICObjectInstanceID());
 
-		Link newsDelete = new Link(this.iwb.getImage("/shared/delete.gif"));
+		Link newsDelete = new Link(iwb.getImage("/shared/delete.gif"));
 		newsDelete.setWindowToOpen(NewsEditorWindow.class);
 		newsDelete.addParameter(NewsEditorWindow.prmDelete, news.getID());
 
@@ -895,18 +875,16 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 		links.setCellpadding(0);
 		links.setCellspacing(0);
 		links.add(newsEdit, 1, 1);
-		links.add(Table.getTransparentCell(iwc), 2, 1);
+		links.add(links.getTransparentCell(iwc), 2, 1);
 		links.add(newsDelete, 3, 1);
 		return links;
 	}
 
 	private Text getInfoText(NwNews nwNews, Content content, Locale locale, boolean ifUseOnlyDates, boolean ifShowTime, boolean ifShowTimeFirst, boolean showUpdatedDate) {
-		if (this.showInfo) {
+		if (showInfo) {
 			String categoryName = "";
 			try {
-				if (this.showCategoryInSingleLineView) {
-					categoryName = nwNews.getNewsCategory().getName(locale);
-				}
+				if (showCategoryInSingleLineView) categoryName = nwNews.getNewsCategory().getName(locale);
 			}
 			catch (RuntimeException e) {
 				System.out.println("Error in NewsReader#getInfoText(...)");
@@ -914,24 +892,33 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 			}
 			return new Text(NewsFormatter.getInfoText(nwNews, content, categoryName, locale, ifUseOnlyDates, ifShowTime, ifShowTimeFirst, showUpdatedDate));
 		}
-		else {
+		else
 			return null;
-		}
 	}
 
 	public void main(IWContext iwc) throws Exception {
-		this.hasEdit = iwc.hasEditPermission(this);
-		this.hasAdd = iwc.hasPermission(AddPermisson, this);
-		this.hasInfo = iwc.hasPermission(InfoPermission, this);
-		this.hasEditExisting = iwc.hasPermission(EditExistingPermission, this);
+		hasEdit = iwc.hasEditPermission(this);
+		hasAdd = iwc.hasPermission(AddPermisson, this);
+		hasInfo = iwc.hasPermission(InfoPermission, this);
+		hasEditExisting = iwc.hasPermission(EditExistingPermission, this);
 
-		this.iwb = getBundle(iwc);
-		this.iwrb = getResourceBundle(iwc);
+		iwb = getBundle(iwc);
+		iwrb = getResourceBundle(iwc);
 		control(iwc);
 	}
 
 	public boolean deleteBlock(int instanceid) {
 		return NewsBusiness.disconnectBlock(instanceid);
+	}
+
+	public void setConnectionAttributes(String attributeName, int attributeId) {
+		this.attributeName = attributeName;
+		this.attributeId = attributeId;
+	}
+
+	public void setConnectionAttributes(String attributeName, String attributeId) {
+		this.attributeName = attributeName;
+		this.attributeId = Integer.parseInt(attributeId);
 	}
 
 	/*
@@ -948,19 +935,19 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 	 * texts.
 	 */
 	public Text getTextProxy() {
-		return this.textProxy;
+		return textProxy;
 	}
 
 	public Text getHeadlineProxy() {
-		return this.headlineProxy;
+		return headlineProxy;
 	}
 
 	public Text getInformationProxy() {
-		return this.informationProxy;
+		return informationProxy;
 	}
 
 	public Text getMoreProxy() {
-		return this.moreProxy;
+		return moreProxy;
 	}
 
 	public void setTextProxy(Text textProxy) {
@@ -976,25 +963,25 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 	}
 
 	private Text setTextAttributes(Text realText) {
-		Text tempText = (Text) this.textProxy.clone();
+		Text tempText = (Text) textProxy.clone();
 		tempText.setText(realText.getText());
 		return tempText;
 	}
 
 	private Text setHeadlineAttributes(Text realText) {
-		Text tempText = (Text) this.headlineProxy.clone();
+		Text tempText = (Text) headlineProxy.clone();
 		tempText.setText(realText.getText());
 		return tempText;
 	}
 
 	private Text setInformationAttributes(Text realText) {
-		Text tempText = (Text) this.informationProxy.clone();
+		Text tempText = (Text) informationProxy.clone();
 		tempText.setText(realText.getText());
 		return tempText;
 	}
 
 	private Text setMoreAttributes(Text realText) {
-		Text tempText = (Text) this.moreProxy.clone();
+		Text tempText = (Text) moreProxy.clone();
 		tempText.setText(realText.getText());
 		return tempText;
 	}
@@ -1108,12 +1095,12 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 	}
 
 	public void setBackgroundColor(String color) {
-		this.firstTableColor = color;
+		firstTableColor = color;
 	}
 
 	public void setZebraColored(String firstColor, String secondColor) {
-		this.firstTableColor = firstColor;
-		this.secondTableColor = secondColor;
+		firstTableColor = firstColor;
+		secondTableColor = secondColor;
 	}
 
 	public void setCellPadding(int cellpad) {
@@ -1187,10 +1174,11 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 	}
 
 	public void setFirstImageWidth(int imageWith) {
+		firstImageWidth = imageWith;
 	}
 
 	public void setImageWidth(int imagewidth) {
-		this.ImageWidth = imagewidth;
+		ImageWidth = imagewidth;
 	}
 
 	public void setCollectionImage(Image image) {
@@ -1211,11 +1199,11 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 	}
 
 	public void setViewPage(com.idega.core.builder.data.ICPage page) {
-		this.viewPageId = page.getID();
+		viewPageId = page.getID();
 	}
 
 	public void setShowTime(boolean showTime) {
-		this.showTime = this.showOnlyDates;
+		this.showTime = showOnlyDates;
 	}
 
 	public void setSpaceBetweenNews(int pixels) {
@@ -1251,29 +1239,26 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 	}
 
 	public String getObjectAlignment() {
-		return this.sObjectAlign;
+		return sObjectAlign;
 	}
 
 	public void setObjectAligment(String sAlign) {
-		this.sObjectAlign = sAlign;
+		sObjectAlign = sAlign;
 	}
 
 	public void addObjectBetween(PresentationObject object, int spaceNumber) {
-		if (this.objectsBetween == null) {
-			this.objectsBetween = new Hashtable();
-		}
-		this.objectsBetween.put(new Integer(spaceNumber), object);
+		if (objectsBetween == null) objectsBetween = new Hashtable();
+		objectsBetween.put(new Integer(spaceNumber), object);
 	}
 
 	// overriding super class method
 	public void add(PresentationObject MO) {
-		addObjectBetween(MO, this.iSpaceBetween);
-		if (this.iLayout == NEWS_SITE_LAYOUT) {
-			this.iSpaceBetween += 2;
+		addObjectBetween(MO, iSpaceBetween);
+		if (iLayout == NEWS_SITE_LAYOUT) {
+			iSpaceBetween += 2;
 		}
-		else {
-			this.iSpaceBetween++;
-		}
+		else
+			iSpaceBetween++;
 	}
 
 	public synchronized Object clone() {
@@ -1282,74 +1267,58 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 			obj = (NewsReader) super.clone();
 
 			// integers :
-			obj.numberOfLetters = this.numberOfLetters;
-			obj.numberOfHeadlineLetters = this.numberOfHeadlineLetters;
-			obj.numberOfDisplayedNews = this.numberOfDisplayedNews;
-			obj.numberOfExpandedNews = this.numberOfExpandedNews;
-			obj.numberOfCollectionNews = this.numberOfCollectionNews;
-			obj.iSpaceBetween = this.iSpaceBetween;
-			obj.cellPadding = this.cellPadding;
-			obj.cellSpacing = this.cellSpacing;
-			obj.viewPageId = this.viewPageId;
-			obj.textSize = this.textSize;
+			obj.numberOfLetters = numberOfLetters;
+			obj.numberOfHeadlineLetters = numberOfHeadlineLetters;
+			obj.numberOfDisplayedNews = numberOfDisplayedNews;
+			obj.numberOfExpandedNews = numberOfExpandedNews;
+			obj.numberOfCollectionNews = numberOfCollectionNews;
+			obj.iSpaceBetween = iSpaceBetween;
+			obj.cellPadding = cellPadding;
+			obj.cellSpacing = cellSpacing;
+			obj.viewPageId = viewPageId;
+			obj.textSize = textSize;
 
 			// booleans:
-			obj.showBackButton = this.showBackButton;
-			obj.showAll = this.showAll;
-			obj.showImages = this.showImages;
-			obj.showOnlyDates = this.showOnlyDates;
-			obj.showTime = this.showTime;
-			obj.showInfo = this.showInfo;
-			obj.showTimeFirst = this.showTimeFirst;
-			obj.headlineAsLink = this.headlineAsLink;
-			obj.setHeadlineLinktToCategoryMainViewerPage = this.setHeadlineLinktToCategoryMainViewerPage;
-			obj.showHeadlineImage = this.showHeadlineImage;
-			obj.showMoreButton = this.showMoreButton;
-			obj.alignWithHeadline = this.alignWithHeadline;
-			obj.limitNumberOfNews = this.limitNumberOfNews;
-			obj.enableDelete = this.enableDelete;
-			obj.viewNews = this.viewNews;
-			obj.newobjinst = this.newobjinst;
-			obj.showBackText = this.showBackText;
-			obj.showMoreText = this.showMoreText;
-			obj.showTeaserText = this.showTeaserText;
+			obj.showBackButton = showBackButton;
+			obj.showAll = showAll;
+			obj.showImages = showImages;
+			obj.showOnlyDates = showOnlyDates;
+			obj.showTime = showTime;
+			obj.showInfo = showInfo;
+			obj.showTimeFirst = showTimeFirst;
+			obj.headlineAsLink = headlineAsLink;
+			obj.setHeadlineLinktToCategoryMainViewerPage = setHeadlineLinktToCategoryMainViewerPage;
+			obj.showHeadlineImage = showHeadlineImage;
+			obj.showMoreButton = showMoreButton;
+			obj.alignWithHeadline = alignWithHeadline;
+			obj.limitNumberOfNews = limitNumberOfNews;
+			obj.enableDelete = enableDelete;
+			obj.viewNews = viewNews;
+			obj.newobjinst = newobjinst;
+			obj.showBackText = showBackText;
+			obj.showMoreText = showMoreText;
+			obj.showTeaserText = showTeaserText;
 			// Strings :
-			obj.outerTableWidth = this.outerTableWidth;
-			obj.sObjectAlign = this.sObjectAlign;
-			obj.headlineImageURL = this.headlineImageURL;
-			obj.dateAlign = this.dateAlign;
+			obj.outerTableWidth = outerTableWidth;
+			obj.sObjectAlign = sObjectAlign;
+			obj.headlineImageURL = headlineImageURL;
+			obj.dateAlign = dateAlign;
 
-			if (this.headlineImage != null) {
-				obj.headlineImage = this.headlineImage;
-			}
-			if (this.backImage != null) {
-				obj.backImage = this.backImage;
-			}
-			if (this.moreImage != null) {
-				obj.moreImage = this.moreImage;
-			}
-			if (this.collectionImage != null) {
-				obj.collectionImage = this.collectionImage;
-			}
+			if (headlineImage != null) obj.headlineImage = headlineImage;
+			if (backImage != null) obj.backImage = backImage;
+			if (moreImage != null) obj.moreImage = moreImage;
+			if (collectionImage != null) obj.collectionImage = collectionImage;
 
 			// Nullable :
-			if (this.firstTableColor != null) {
-				obj.firstTableColor = this.firstTableColor;
-			}
-			if (this.secondTableColor != null) {
-				obj.secondTableColor = this.secondTableColor;
-			}
-			if (this.objectsBetween != null) {
-				obj.objectsBetween = this.objectsBetween;
-			}
-			if (this.spacerImage != null) {
-				obj.spacerImage = this.spacerImage;
-			}
+			if (firstTableColor != null) obj.firstTableColor = firstTableColor;
+			if (secondTableColor != null) obj.secondTableColor = secondTableColor;
+			if (objectsBetween != null) obj.objectsBetween = objectsBetween;
+			if (spacerImage != null) obj.spacerImage = spacerImage;
 
 			// Text proxies :
-			obj.textProxy = this.textProxy;
-			obj.headlineProxy = this.headlineProxy;
-			obj.informationProxy = this.informationProxy;
+			obj.textProxy = textProxy;
+			obj.headlineProxy = headlineProxy;
+			obj.informationProxy = informationProxy;
 
 		}
 		catch (Exception ex) {
@@ -1365,8 +1334,8 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 		if (iwc.isParameterSet(parName)) {
 			returnString += parName+"="+iwc.getParameter(parName);
 		} else {
-			if (this.viewNews) {
-				if(this.visibleNewsRangeStart>0) {
+			if (viewNews) {
+				if(visibleNewsRangeStart>0) {
 					Enumeration enumer = iwc.getParameterNames();
 					while (enumer.hasMoreElements()) {
 						String pName = (String) enumer.nextElement();
@@ -1379,16 +1348,12 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 			}
 		}
 		parName = prmListCategory + getInstanceIDString(iwc);
-		if (iwc.isParameterSet(parName)) {
-			returnString += parName + "=" + iwc.getParameter(parName);
-		}
+		if (iwc.isParameterSet(parName)) returnString += parName + "=" + iwc.getParameter(parName);
 		parName = prmNewsCategoryId;
 		if (iwc.isParameterSet(parName)) {
 			returnString += parName + "=" + iwc.getParameter(parName);
 			parName = prmCollection + getInstanceIDString(iwc);
-			if (iwc.isParameterSet(parName)) {
-				returnString += parName + "=" + iwc.getParameter(parName);
-			}
+			if (iwc.isParameterSet(parName)) returnString += parName + "=" + iwc.getParameter(parName);
 		}
 		return cacheStatePrefix + returnString;
 	}
@@ -1403,33 +1368,18 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 				String att = imagefile.getMetaData(NewsEditorWindow.imageAttributeKey);
 
 				Image newsImage = new Image(imid);
-				if (att != null) {
+				if (att != null)
 					newsImage.addMarkupAttributes(getAttributeMap(att));
-				}
 				else {
 					newsImage.setAlignment("right");
-					newsImage.setBorder(this.ImageBorder);
+					newsImage.setBorder(ImageBorder);
 				}
-				// first news
-				if (this.newsCount == 1) {
-					if (newsImage.getWidth() == null || newsImage.getWidth().length() == 0) {
-						newsImage.setMaxImageWidth(this.ImageWidth);
-					}
-					return newsImage;
-				}
-				// other news
-				else {
-					if (newsImage.getWidth() == null || newsImage.getWidth().length() == 0) {
-						newsImage.setMaxImageWidth(this.ImageWidth);
-					}
-					Link L = new Link(newsImage);
-					L.addParameter(ImageWindow.prmImageId, imid);
-					if (this.addImageInfo) {
-						L.addParameter(ImageWindow.prmInfo, TextSoap.convertSpecialCharacters(headline));
-					}
-					L.setWindowToOpen(ImageWindow.class);
-					return L;
-				}
+				if (newsImage.getWidth() == null || newsImage.getWidth().length() == 0) newsImage.setMaxImageWidth(ImageWidth);
+				Link L = new Link(newsImage);
+				L.addParameter(ImageWindow.prmImageId, imid);
+				if (addImageInfo) L.addParameter(ImageWindow.prmInfo, TextSoap.convertSpecialCharacters(headline));
+				L.setWindowToOpen(ImageWindow.class);
+				return L;
 			}
 			catch (Exception ex) {
 				ex.printStackTrace();
@@ -1442,7 +1392,7 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 	 * @param addImageInfo
 	 */
 	public void setShowImageInfo(boolean showImageInfo) {
-		this.addImageInfo = showImageInfo;
+		addImageInfo = showImageInfo;
 	}
 
 	public void setVisibleNewsRange(int start, int end) {
@@ -1476,7 +1426,7 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 	 * @return Returns the setHeadlineLinktToCategoryMainViewerPage.
 	 */
 	public boolean isHeadlineLinktSetToCategoryMainViewerPage() {
-		return this.setHeadlineLinktToCategoryMainViewerPage;
+		return setHeadlineLinktToCategoryMainViewerPage;
 	}
 
 	/**
@@ -1510,19 +1460,19 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 	 * @return Returns the collectionLinkStyleClass.
 	 */
 	public String getCollectionLinkStyleClass() {
-		return this.CollectionLinkStyleClass;
+		return CollectionLinkStyleClass;
 	}
 	/**
 	 * @param collectionLinkStyleClass The collectionLinkStyleClass to set.
 	 */
 	public void setCollectionLinkStyleClass(String collectionLinkStyleClass) {
-		this.CollectionLinkStyleClass = collectionLinkStyleClass;
+		CollectionLinkStyleClass = collectionLinkStyleClass;
 	}
 	/**
 	 * @return Returns the backStyleClass.
 	 */
 	public String getBackStyleClass() {
-		return this.backStyleClass;
+		return backStyleClass;
 	}
 	/**
 	 * @param backStyleClass The backStyleClass to set.
@@ -1534,7 +1484,7 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 	 * @return Returns the moreStyleClass.
 	 */
 	public String getMoreStyleClass() {
-		return this.moreStyleClass;
+		return moreStyleClass;
 	}
 	/**
 	 * @param moreStyleClass The moreStyleClass to set.
