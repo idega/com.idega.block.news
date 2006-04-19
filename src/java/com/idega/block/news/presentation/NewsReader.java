@@ -1,5 +1,5 @@
 /*
- * $Id: NewsReader.java,v 1.145 2006/04/09 11:56:46 laddi Exp $
+ * $Id: NewsReader.java,v 1.146 2006/04/19 16:01:04 sigtryggur Exp $
  *
  * Copyright (C) 2001 Idega hf. All Rights Reserved.
  *
@@ -135,7 +135,6 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 	public static final int COLLECTION_LAYOUT = NewsLayoutHandler.COLLECTION_LAYOUT;
 
 	private int iLayout = SINGLE_FILE_LAYOUT;
-	private int newsCount = 0;
 
 	private int visibleNewsRangeStart = 0;
 	private int visibleNewsRangeEnd = Integer.MAX_VALUE;
@@ -692,7 +691,6 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 			}
 			else if (locText != null && !collection) {
 				// counting news
-				this.newsCount++;
 				sNewsBody = locText.getBody();
 				sNewsBody = sNewsBody == null ? "" : sNewsBody;
 
@@ -1410,26 +1408,16 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 					newsImage.setAlignment("right");
 					newsImage.setBorder(this.ImageBorder);
 				}
-				// first news
-				if (this.newsCount == 1) {
-					if (newsImage.getWidth() == null || newsImage.getWidth().length() == 0) {
-						newsImage.setMaxImageWidth(this.ImageWidth);
-					}
-					return newsImage;
+				if (newsImage.getWidth() == null || newsImage.getWidth().length() == 0) {
+					newsImage.setMaxImageWidth(this.ImageWidth);
 				}
-				// other news
-				else {
-					if (newsImage.getWidth() == null || newsImage.getWidth().length() == 0) {
-						newsImage.setMaxImageWidth(this.ImageWidth);
-					}
-					Link L = new Link(newsImage);
-					L.addParameter(ImageWindow.prmImageId, imid);
-					if (this.addImageInfo) {
-						L.addParameter(ImageWindow.prmInfo, TextSoap.convertSpecialCharacters(headline));
-					}
-					L.setWindowToOpen(ImageWindow.class);
-					return L;
+				Link L = new Link(newsImage);
+				L.addParameter(ImageWindow.prmImageId, imid);
+				if (this.addImageInfo) {
+					L.addParameter(ImageWindow.prmInfo, TextSoap.convertSpecialCharacters(headline));
 				}
+				L.setWindowToOpen(ImageWindow.class);
+				return L;
 			}
 			catch (Exception ex) {
 				ex.printStackTrace();
