@@ -1,5 +1,5 @@
 author=H\u00F6fundur
-back=til baka...
+back=<< til baka
 category=Flokkur
 close=Loka
 collection=Safn
@@ -13,7 +13,7 @@ images=Myndir
 iw.component.com.idega.block.news.presentation.NewsReader.name=Fr\u00E9ttastj\u00F3ri
 letters=Br\u00E9f
 locale=Tungum\u00E1l
-more=meira...
+more=meira >>
 news=Texti
 news_date=Dagsetning
 news_editor=Fr\u00E9ttastj\u00F3ri
