@@ -18,6 +18,11 @@
       <name>1.0.1</name>
       <tag>NEWS_1_0_1</tag>
     </version>
+    <version>
+      <id>3.1.0</id>
+      <name>3.1.0</name>
+      <tag>NEWS_3_1_0</tag>
+    </version>
   </versions>
   <branches/>
   <developers>
@@ -59,8 +64,10 @@
       <url>http://www.idega.com/</url>
       <properties>
         <!--<j:if test="${idegaweb.project.source.dependent}==&apos;true&apos;}">-->
-          <eclipse.dependency>true</eclipse.dependency>
+
+        <eclipse.dependency>true</eclipse.dependency>
         <!--</j:if>-->
+
       </properties>
     </dependency>
     <dependency>
@@ -70,9 +77,11 @@
       <type>jar</type>
       <url>http://www.idega.com/</url>
       <properties>
-      <!--<j:if test="${idegaweb.project.source.dependent}==&apos;true&apos;}">-->
-          <eclipse.dependency>true</eclipse.dependency>
+        <!--<j:if test="${idegaweb.project.source.dependent}==&apos;true&apos;}">-->
+
+        <eclipse.dependency>true</eclipse.dependency>
         <!--</j:if>-->
+
       </properties>
     </dependency>
     <dependency>
@@ -83,8 +92,10 @@
       <url>http://www.idega.com/</url>
       <properties>
         <!--<j:if test="${idegaweb.project.source.dependent}==&apos;true&apos;}">-->
-          <eclipse.dependency>true</eclipse.dependency>
+
+        <eclipse.dependency>true</eclipse.dependency>
         <!--</j:if>-->
+
       </properties>
     </dependency>
     <dependency>
@@ -95,8 +106,10 @@
       <url>http://www.idega.com/</url>
       <properties>
         <!--<j:if test="${idegaweb.project.source.dependent}==&apos;true&apos;}">-->
-          <eclipse.dependency>true</eclipse.dependency>
+
+        <eclipse.dependency>true</eclipse.dependency>
         <!--</j:if>-->
+
       </properties>
     </dependency>
     <dependency>
@@ -107,8 +120,10 @@
       <url>http://www.idega.com/</url>
       <properties>
         <!--<j:if test="${idegaweb.project.source.dependent}==&apos;true&apos;}">-->
-          <eclipse.dependency>true</eclipse.dependency>
+
+        <eclipse.dependency>true</eclipse.dependency>
         <!--</j:if>-->
+
       </properties>
     </dependency>
   </dependencies>
