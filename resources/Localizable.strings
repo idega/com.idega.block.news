@@ -21,6 +21,7 @@ news_to_delete=
 newsimages=News images \:
 no_news=No News
 no_news_category=
+not_exists=News already deleted or not available.
 publish_from=Publish from
 publish_to=Publish to
 save=Save
