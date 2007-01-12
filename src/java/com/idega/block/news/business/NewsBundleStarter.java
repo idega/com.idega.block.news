@@ -91,8 +91,8 @@ public class NewsBundleStarter implements IWBundleStartable{
 		      String info = RS.getString("DESCRIPTION");
 		      oinst = SimpleQuerier.executeStringQuery(sql2+id,Conn);
 		      if(oinst !=null && oinst.length > 0) {
-						objectinstance_id = Integer.parseInt(oinst[0]);
-					}
+				objectinstance_id = Integer.parseInt(oinst[0]);
+			}
 		      ICCategory cat = ((com.idega.block.category.data.ICCategoryHome)com.idega.data.IDOLookup.getHome(ICCategory.class)).create();
 		      cat.setName(name);
 		      cat.setDescription(info);
