@@ -5,6 +5,12 @@
   </properties>
   <body>
   
+  <release version="3.1.1" date="2007-04-23">
+      <action dev="eiki" type="update">
+        Merged from v.2 for use with 3.1
+      </action>              
+    </release>
+    
 	<release version="3.1.0" date="2006-06-26">
       <action dev="tryggvil" type="update">
         Declaration of version for use with core 3.0.5

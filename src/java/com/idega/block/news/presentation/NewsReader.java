@@ -1,5 +1,5 @@
 /*
- * $Id: NewsReader.java,v 1.146 2006/04/19 16:01:04 sigtryggur Exp $
+ * $Id: NewsReader.java,v 1.147 2007/04/23 16:32:17 eiki Exp $
  *
  * Copyright (C) 2001 Idega hf. All Rights Reserved.
  *
@@ -30,6 +30,7 @@ import com.idega.block.text.business.ContentHelper;
 import com.idega.block.text.data.Content;
 import com.idega.block.text.data.LocalizedText;
 import com.idega.core.file.data.ICFile;
+import com.idega.core.user.data.User;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.idegaweb.block.presentation.Builderaware;
@@ -58,7 +59,14 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 	public final static String CACHE_KEY = "nw_news";
 	private boolean hasEdit = false, hasAdd = false, hasInfo = false, hasEditExisting = false;
 	private int iCategoryId = -1;
+	private String attributeName = null;
+	private int attributeId = -1;
+	private User eUser = null;
+
 	private boolean showNewsCollectionButton = false;
+	private int categoryId = 0;
+
+	private Table outerTable = new Table(1, 1);
 
 	private int numberOfLetters = 273;
 	private int numberOfHeadlineLetters = -1;
@@ -72,6 +80,7 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 	private int cellSpacing = 0;
 	private int viewPageId = -1;
 	private int textSize = 2;
+	private int firstImageWidth = 200;
 	private int ImageWidth = 100;
 	private int ImageBorder = 1;
 	private int dateWidth = 60;
@@ -116,8 +125,13 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 	private Image spacerImage = null;
 
 	private static String prmFromPage = "nwr_from_page";
+	private static String prmDelete = "nwr_delete";
+	private static String prmEdit = "nwr_edit";
+	private static String prmNew = "nwr_new";
 	private static String prmMore = "nwr_more";
 	private static String prmCollection = "nwr_collection";
+	private static String prmObjIns = "nwr_instance_id";
+
 	public static String prmListCategory = "nwr_newscategoryid";
 	public static String prmNewsCategoryId = "nwr_listcategory";
 
@@ -176,6 +190,10 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 		this.informationProxy.setFontColor("#666666");
 		this.textProxy.setFontSize(1);
 		this.informationProxy.setFontSize(1);
+	}
+
+	private void checkCategories() {
+
 	}
 
 	/** @todo take out when instanceId handler is used */
@@ -326,7 +344,7 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 			}
 
 			if (this.hasEdit && enableDelete) {
-				T.add(Table.getTransparentCell(iwc), 1, 1);
+				T.add(T.getTransparentCell(iwc), 1, 1);
 				Link delete = new Link(core.getImage("/shared/delete.gif"));
 				delete.setWindowToOpen(NewsEditorWindow.class);
 				delete.addParameter(NewsEditorWindow.prmDelete, iCategoryId);
@@ -408,10 +426,10 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 		IWTimestamp created = new IWTimestamp(newsHelper.getContentHelper().getContent().getCreated());
 		IWTimestamp updated = new IWTimestamp(newsHelper.getContentHelper().getContent().getLastUpdated());
 
-		Text tFrom = formatText(df.format(from.getTimestamp()), true);
-		Text tTo = formatText(df.format(to.getTimestamp()), true);
-		Text tCreated = formatText(df.format(created.getTimestamp()), false);
-		Text tUpdated = formatText(df.format(updated.getTimestamp()), false);
+		Text tFrom = formatText(df.format((java.util.Date) from.getTimestamp()), true);
+		Text tTo = formatText(df.format((java.util.Date) to.getTimestamp()), true);
+		Text tCreated = formatText(df.format((java.util.Date) created.getTimestamp()), false);
+		Text tUpdated = formatText(df.format((java.util.Date) updated.getTimestamp()), false);
 
 		// Unpublished
 		if (from.isLaterThan(now)) {
@@ -792,7 +810,7 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 				T.add(newsInfo, dateCol, 1);
 			}
 			if (this.spacerImage == null) {
-				this.spacerImage = Table.getTransparentCell(iwc);
+				this.spacerImage = T.getTransparentCell(iwc);
 				this.spacerImage.setWidth(this.iSpaceBetweenNewsAndBody);
 				this.spacerImage.setHeight(1);
 			}
@@ -893,7 +911,7 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 		links.setCellpadding(0);
 		links.setCellspacing(0);
 		links.add(newsEdit, 1, 1);
-		links.add(Table.getTransparentCell(iwc), 2, 1);
+		links.add(links.getTransparentCell(iwc), 2, 1);
 		links.add(newsDelete, 3, 1);
 		return links;
 	}
@@ -930,6 +948,16 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 
 	public boolean deleteBlock(int instanceid) {
 		return NewsBusiness.disconnectBlock(instanceid);
+	}
+
+	public void setConnectionAttributes(String attributeName, int attributeId) {
+		this.attributeName = attributeName;
+		this.attributeId = attributeId;
+	}
+
+	public void setConnectionAttributes(String attributeName, String attributeId) {
+		this.attributeName = attributeName;
+		this.attributeId = Integer.parseInt(attributeId);
 	}
 
 	/*
@@ -1185,6 +1213,7 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 	}
 
 	public void setFirstImageWidth(int imageWith) {
+		this.firstImageWidth = imageWith;
 	}
 
 	public void setImageWidth(int imagewidth) {

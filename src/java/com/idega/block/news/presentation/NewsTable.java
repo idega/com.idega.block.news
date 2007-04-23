@@ -31,6 +31,8 @@ public class NewsTable extends PresentationObjectContainer {
 
 
 
+  private int linejump = 1;
+
   protected int tableRows;
 
   protected int tableColumns;
@@ -53,7 +55,7 @@ public class NewsTable extends PresentationObjectContainer {
 
   private String sAlign = "left";
 
-	boolean zebracolored = false,usecolor = false;
+	boolean zebracolored = false,usecolor = false;;
 
 
 
@@ -142,8 +144,8 @@ public class NewsTable extends PresentationObjectContainer {
         rows = this.iUndividedCount + (left/this.iDividedColumnCount);
 
         if((left%this.iDividedColumnCount)>0) {
-					rows++;
-				}
+			rows++;
+		}
 
       }
 
@@ -171,7 +173,7 @@ public class NewsTable extends PresentationObjectContainer {
 
 
 
-  // Stilla töflu vegna óákveðinnar stærðar
+  // Stilla tï¿½flu vegna ï¿½ï¿½kveï¿½innar stï¿½rï¿½ar
 
   private void finite(){
 
@@ -196,8 +198,8 @@ public class NewsTable extends PresentationObjectContainer {
   public void add(PresentationObject Mo,boolean useSetDivison,String sAlign){
 
     if(this.table == null) {
-			init();
-		}
+		init();
+	}
 
 
 
@@ -288,11 +290,11 @@ public class NewsTable extends PresentationObjectContainer {
 		if(this.zebracolored){
 
 		  if(this.color.equals(this.firstColor)) {
-				this.color = this.secondColor;
-			}
-			else {
-				this.color = this.firstColor;
-			}
+			this.color = this.secondColor;
+		}
+		else {
+			this.color = this.firstColor;
+		}
 
 		}
 
