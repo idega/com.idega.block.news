@@ -1,5 +1,5 @@
 /*
- * $Id: NewsReader.java,v 1.147 2007/04/23 16:32:17 eiki Exp $
+ * $Id: NewsReader.java,v 1.148 2007/04/27 10:29:59 gimmi Exp $
  *
  * Copyright (C) 2001 Idega hf. All Rights Reserved.
  *
@@ -344,7 +344,7 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 			}
 
 			if (this.hasEdit && enableDelete) {
-				T.add(T.getTransparentCell(iwc), 1, 1);
+				T.add(Table.getTransparentCell(iwc), 1, 1);
 				Link delete = new Link(core.getImage("/shared/delete.gif"));
 				delete.setWindowToOpen(NewsEditorWindow.class);
 				delete.addParameter(NewsEditorWindow.prmDelete, iCategoryId);
@@ -810,7 +810,7 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 				T.add(newsInfo, dateCol, 1);
 			}
 			if (this.spacerImage == null) {
-				this.spacerImage = T.getTransparentCell(iwc);
+				this.spacerImage = Table.getTransparentCell(iwc);
 				this.spacerImage.setWidth(this.iSpaceBetweenNewsAndBody);
 				this.spacerImage.setHeight(1);
 			}
@@ -911,7 +911,7 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 		links.setCellpadding(0);
 		links.setCellspacing(0);
 		links.add(newsEdit, 1, 1);
-		links.add(links.getTransparentCell(iwc), 2, 1);
+		links.add(Table.getTransparentCell(iwc), 2, 1);
 		links.add(newsDelete, 3, 1);
 		return links;
 	}
