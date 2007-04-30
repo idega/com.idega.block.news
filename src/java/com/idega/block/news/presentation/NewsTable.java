@@ -1,45 +1,37 @@
 package com.idega.block.news.presentation;
 
-
-
 import com.idega.presentation.IWContext;
 import com.idega.presentation.PresentationObject;
 import com.idega.presentation.PresentationObjectContainer;
 import com.idega.presentation.Table;
 
-
-
 public class NewsTable extends PresentationObjectContainer {
 
+	public static final int SINGLE_FILE_LAYOUT = 1;
 
+	public static final int NEWS_SITE_LAYOUT = 2;
 
-  public static final int SINGLE_FILE_LAYOUT = 1;
+	public static final int NEWS_PAPER_LAYOUT = 3;
 
-  public static final int NEWS_SITE_LAYOUT = 2;
+	private int iLayout = NEWS_SITE_LAYOUT;
 
-  public static final int NEWS_PAPER_LAYOUT = 3;
+	private int iObjectCount = 0;
 
-  private int iLayout = NEWS_SITE_LAYOUT;
+	private int iUndividedCount = 1;
 
-  private int iObjectCount = 0;
+	private int iDividedColumnCount = 2;
 
-  private int iUndividedCount = 1;
+	private int iPlannedObjectCount = 1;
 
-  private int iDividedColumnCount = 2;
+	// private int linejump = 1;
 
-  private int iPlannedObjectCount = 1;
+	protected int tableRows;
 
+	protected int tableColumns;
 
+	protected int rowToAddIn;
 
-  private int linejump = 1;
-
-  protected int tableRows;
-
-  protected int tableColumns;
-
-  protected int rowToAddIn;
-
-  protected int colToAddIn;
+	protected int colToAddIn;
 
 	private int cellPadding = 0;
 
@@ -51,47 +43,35 @@ public class NewsTable extends PresentationObjectContainer {
 
 	private String color = "";
 
+	private String sAlign = "left";
 
+	boolean zebracolored = false, usecolor = false;
 
-  private String sAlign = "left";
+	private Table table = null;
 
-	boolean zebracolored = false,usecolor = false;;
+	public NewsTable() {
 
+		this.iLayout = NEWS_SITE_LAYOUT;
 
+	}
 
-  private Table table = null;
+	public NewsTable(int iLayout) {
 
+		this.iLayout = iLayout;
 
+	}
 
-  public NewsTable(){
+	public NewsTable(int iLayout, int iNumberOfObjects) {
 
-    this.iLayout = NEWS_SITE_LAYOUT;
+		this.iLayout = iLayout;
 
-  }
+		this.iPlannedObjectCount = iNumberOfObjects;
 
+	}
 
+	public NewsTable(int iLayout, int cellPadding, int cellSpacing, String firstColor, String secondColor) {
 
-  public NewsTable(int iLayout){
-
-    this.iLayout = iLayout ;
-
-  }
-
-
-
-  public NewsTable(int iLayout,int iNumberOfObjects){
-
-    this.iLayout = iLayout ;
-
-    this.iPlannedObjectCount = iNumberOfObjects;
-
-  }
-
-
-
-	public NewsTable(int iLayout,int cellPadding,int cellSpacing,String firstColor,String secondColor){
-
-    this.iLayout = iLayout ;
+		this.iLayout = iLayout;
 
 		this.cellPadding = cellPadding;
 
@@ -101,13 +81,11 @@ public class NewsTable extends PresentationObjectContainer {
 
 		this.secondColor = secondColor;
 
-		if(firstColor != null ){
+		if (firstColor != null) {
 
-			if(secondColor != null) {
-				this.zebracolored =true;
+			if (secondColor != null) {
+				this.zebracolored = true;
 			}
-
-
 
 			this.color = firstColor;
 
@@ -115,219 +93,197 @@ public class NewsTable extends PresentationObjectContainer {
 
 		}
 
+	}
 
+	private void init() {
 
-  }
+		this.tableRows = 1;
 
+		this.tableColumns = 1;
 
+		this.rowToAddIn = 1;
 
-  private void init(){
+		this.colToAddIn = 1;
 
-    this.tableRows = 1;
+		if (this.iLayout == NEWS_SITE_LAYOUT) {
 
-    this.tableColumns = 1;
+			int rows = 1;
 
-    this.rowToAddIn = 1;
+			// calculate rows needed
 
-    this.colToAddIn = 1;
+			if (this.iPlannedObjectCount > this.iDividedColumnCount) {
 
-    if(this.iLayout == NEWS_SITE_LAYOUT){
+				int left = this.iPlannedObjectCount - this.iUndividedCount;
 
-      int rows = 1;
+				rows = this.iUndividedCount + (left / this.iDividedColumnCount);
 
-      // calculate rows needed
+				if ((left % this.iDividedColumnCount) > 0) {
+					rows++;
+				}
 
-      if(this.iPlannedObjectCount > this.iDividedColumnCount ){
+			}
 
-        int left = this.iPlannedObjectCount-this.iUndividedCount;
+			this.table = new Table(this.iDividedColumnCount, rows);
 
-        rows = this.iUndividedCount + (left/this.iDividedColumnCount);
-
-        if((left%this.iDividedColumnCount)>0) {
-			rows++;
 		}
 
-      }
+		else {
 
-      this.table = new Table(this.iDividedColumnCount,rows);
+			this.table = new Table(1, this.iPlannedObjectCount);
 
-    }
+		}
 
-    else{
-
-      this.table = new Table(1,this.iPlannedObjectCount);
-
-    }
-
-    this.table.setWidth("100%");
+		this.table.setWidth("100%");
 
 		this.table.setCellpadding(this.cellPadding);
 
 		this.table.setCellspacing(this.cellSpacing);
 
-    this.table.setResizable(true);
+		this.table.setResizable(true);
 
-    //table.setBorder(1);
+		// table.setBorder(1);
 
-  }
-
-
-
-  // Stilla t�flu vegna ��kve�innar st�r�ar
-
-  private void finite(){
-
-    if(this.table != null){
-
-      for (int i = 1; i <= this.table.getColumns(); i++) {
-
-        int percent = 100/this.iDividedColumnCount ;
-
-        this.table.setWidth(i,percent+"%");
-
-        this.table.setColumnVerticalAlignment(i,"top");
-
-      }
-
-    }
-
-  }
-
-
-
-  public void add(PresentationObject Mo,boolean useSetDivison,String sAlign){
-
-    if(this.table == null) {
-		init();
 	}
 
+	// Stilla t�flu vegna ��kve�innar st�r�ar
 
+	private void finite() {
 
-    if(useSetDivison && this.iLayout == NEWS_SITE_LAYOUT){
+		if (this.table != null) {
 
-      if(this.iObjectCount < this.iUndividedCount){
+			for (int i = 1; i <= this.table.getColumns(); i++) {
 
-        this.table.mergeCells(1,this.rowToAddIn ,2,this.rowToAddIn );
+				int percent = 100 / this.iDividedColumnCount;
 
-        this.table.add(Mo,this.colToAddIn,this.rowToAddIn);
+				this.table.setWidth(i, percent + "%");
 
-        this.table.setVerticalAlignment(this.colToAddIn,this.rowToAddIn,"top");
+				this.table.setColumnVerticalAlignment(i, "top");
 
-				if(this.usecolor) {
-					this.table.setColor(this.colToAddIn,this.rowToAddIn,this.color);
-				}
-
-        this.iObjectCount++;
-
-        this.rowToAddIn++;
-
-      }
-
-      else if(this.colToAddIn < this.iDividedColumnCount){
-
-        this.table.add(Mo,this.colToAddIn,this.rowToAddIn);
-
-        this.table.setVerticalAlignment(this.colToAddIn,this.rowToAddIn,"top");
-
-				if(this.usecolor) {
-					this.table.setColor(this.colToAddIn,this.rowToAddIn,this.color);
-				}
-
-        this.colToAddIn++;
-
-        this.iObjectCount++;
-
-      }
-
-      else{
-
-        this.table.add(Mo,this.colToAddIn,this.rowToAddIn);
-
-        this.table.setVerticalAlignment(this.colToAddIn,this.rowToAddIn,"top");
-
-				if(this.usecolor) {
-					this.table.setColor(this.colToAddIn,this.rowToAddIn,this.color);
-				}
-
-        this.colToAddIn--;
-
-        this.rowToAddIn++;
-
-        this.iObjectCount++;
-
-      }
-
-    }
-
-    else{
-
-      if(this.colToAddIn <= this.iDividedColumnCount  && this.colToAddIn > this.iUndividedCount){
-
-        this.rowToAddIn++;
-
-      }
-
-      this.colToAddIn = 1;
-
-      this.table.mergeCells(1,this.rowToAddIn ,2,this.rowToAddIn );
-
-      this.table.setAlignment(1,this.rowToAddIn,sAlign);
-
-			if(this.usecolor) {
-				this.table.setColor(this.colToAddIn,this.rowToAddIn,this.color);
 			}
 
-      this.table.add(Mo,1,this.rowToAddIn);
-
-      this.rowToAddIn++;
-
-      this.iObjectCount++;
-
-    }
-
-
-
-		if(this.zebracolored){
-
-		  if(this.color.equals(this.firstColor)) {
-			this.color = this.secondColor;
 		}
+
+	}
+
+	public void add(PresentationObject Mo, boolean useSetDivison, String sAlign) {
+
+		if (this.table == null) {
+			init();
+		}
+
+		if (useSetDivison && this.iLayout == NEWS_SITE_LAYOUT) {
+
+			if (this.iObjectCount < this.iUndividedCount) {
+
+				this.table.mergeCells(1, this.rowToAddIn, 2, this.rowToAddIn);
+
+				this.table.add(Mo, this.colToAddIn, this.rowToAddIn);
+
+				this.table.setVerticalAlignment(this.colToAddIn, this.rowToAddIn, "top");
+
+				if (this.usecolor) {
+					this.table.setColor(this.colToAddIn, this.rowToAddIn, this.color);
+				}
+
+				this.iObjectCount++;
+
+				this.rowToAddIn++;
+
+			}
+
+			else if (this.colToAddIn < this.iDividedColumnCount) {
+
+				this.table.add(Mo, this.colToAddIn, this.rowToAddIn);
+
+				this.table.setVerticalAlignment(this.colToAddIn, this.rowToAddIn, "top");
+
+				if (this.usecolor) {
+					this.table.setColor(this.colToAddIn, this.rowToAddIn, this.color);
+				}
+
+				this.colToAddIn++;
+
+				this.iObjectCount++;
+
+			}
+
+			else {
+
+				this.table.add(Mo, this.colToAddIn, this.rowToAddIn);
+
+				this.table.setVerticalAlignment(this.colToAddIn, this.rowToAddIn, "top");
+
+				if (this.usecolor) {
+					this.table.setColor(this.colToAddIn, this.rowToAddIn, this.color);
+				}
+
+				this.colToAddIn--;
+
+				this.rowToAddIn++;
+
+				this.iObjectCount++;
+
+			}
+
+		}
+
 		else {
-			this.color = this.firstColor;
-		}
+
+			if (this.colToAddIn <= this.iDividedColumnCount && this.colToAddIn > this.iUndividedCount) {
+
+				this.rowToAddIn++;
+
+			}
+
+			this.colToAddIn = 1;
+
+			this.table.mergeCells(1, this.rowToAddIn, 2, this.rowToAddIn);
+
+			this.table.setAlignment(1, this.rowToAddIn, sAlign);
+
+			if (this.usecolor) {
+				this.table.setColor(this.colToAddIn, this.rowToAddIn, this.color);
+			}
+
+			this.table.add(Mo, 1, this.rowToAddIn);
+
+			this.rowToAddIn++;
+
+			this.iObjectCount++;
 
 		}
 
+		if (this.zebracolored) {
 
+			if (this.color.equals(this.firstColor)) {
+				this.color = this.secondColor;
+			}
+			else {
+				this.color = this.firstColor;
+			}
 
-  }
+		}
 
+	}
 
+	public void add(PresentationObject Mo) {
 
-  public void add(PresentationObject Mo){
+		add(Mo, false, this.sAlign);
 
-   add(Mo,false,this.sAlign);
+	}
 
-  }
+	public void add(PresentationObject Mo, String sAlign) {
 
+		add(Mo, false, sAlign);
 
+	}
 
-  public void add(PresentationObject Mo,String sAlign){
+	public void main(IWContext iwc) {
 
-   add(Mo,false,sAlign);
+		finite();
 
-  }
+		super.add(this.table);
 
-
-
-  public void main(IWContext iwc){
-
-    finite();
-
-    super.add(this.table);
-
-  }
-
-
+	}
 
 } // Class ListTable
