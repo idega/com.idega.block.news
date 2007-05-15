@@ -1,5 +1,5 @@
 /*
- * $Id: NewsReader.java,v 1.149 2007/04/30 11:33:09 laddi Exp $
+ * $Id: NewsReader.java,v 1.150 2007/05/15 14:26:19 gimmi Exp $
  * 
  * Copyright (C) 2001 Idega hf. All Rights Reserved.
  * 
@@ -56,22 +56,25 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 
 	private final static String IW_BUNDLE_IDENTIFIER = "com.idega.block.news";
 	public final static String CACHE_KEY = "nw_news";
-	private boolean hasEdit = false, hasAdd = false, hasInfo = false, hasEditExisting = false;
+	protected boolean hasEdit = false;
+	protected boolean hasAdd = false;
+	private boolean hasInfo = false;
+	protected boolean hasEditExisting = false;
 	private int iCategoryId = -1;
 	// private String attributeName = null;
 	// private int attributeId = -1;
 	// private User eUser = null;
 
-	private boolean showNewsCollectionButton = false;
+	protected boolean showNewsCollectionButton = false;
 	// private int categoryId = 0;
 
 	// private Table outerTable = new Table(1, 1);
 
 	private int numberOfLetters = 273;
-	private int numberOfHeadlineLetters = -1;
-	private int numberOfDisplayedNews = 5;
-	private int numberOfExpandedNews = 3;
-	private int numberOfCollectionNews = 30;
+	protected int numberOfHeadlineLetters = -1;
+	protected int numberOfDisplayedNews = 5;
+	protected int numberOfExpandedNews = 3;
+	protected int numberOfCollectionNews = 30;
 	private int iSpaceBetween = 1;
 	private int iSpaceBetweenNews = 20;
 	private int iSpaceBetweenNewsAndBody = 5;
@@ -83,28 +86,28 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 	private int ImageWidth = 100;
 	private int ImageBorder = 1;
 	private int dateWidth = 60;
-	private boolean showBackButton = false;
+	protected boolean showBackButton = false;
 	private boolean showAll = false;
-	private boolean showImages = true;
+	protected boolean showImages = true;
 	private boolean showImagesInOverview = true;
 	private boolean showOnlyDates = false;
 	private boolean showTime = true;
 	private boolean showInfo = true;
 	private boolean showUpdatedDate = false;
 	private boolean showTimeFirst = false;
-	private boolean headlineAsLink = false;
+	protected boolean headlineAsLink = false;
 	private boolean showHeadlineImage = false;
-	private boolean showMoreButton = true;
+	protected boolean showMoreButton = true;
 	private boolean alignWithHeadline = false;
 	private boolean limitNumberOfNews = false;
 	private boolean enableDelete = true;
 	private boolean viewNews = true;
 	private boolean newobjinst = false;
-	private boolean showBackText = false;
-	private boolean showMoreText = false;
-	private boolean showCollectionText = true;
-	private boolean showTeaserText = true;
-	private boolean addImageInfo = true;
+	protected boolean showBackText = false;
+	protected boolean showMoreText = false;
+	protected boolean showCollectionText = true;
+	protected boolean showTeaserText = true;
+	protected boolean addImageInfo = true;
 	private String outerTableWidth = "100%";
 	private String sObjectAlign = "center";
 	private String headlineImageURL;
@@ -112,11 +115,11 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 	private String secondTableColor = null;
 	private String dateAlign = "left";
 	private Image headlineImage = null;
-	private Image backImage = null;
-	private Image moreImage = null;
-	private Image collectionImage = null;
+	protected Image backImage = null;
+	protected Image moreImage = null;
+	protected Image collectionImage = null;
 
-	private Hashtable objectsBetween = null;
+	protected Hashtable objectsBetween = null;
 	private Text textProxy = new Text();
 	private Text headlineProxy = new Text();
 	private Text informationProxy = new Text();
@@ -138,8 +141,8 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 	private static String InfoPermission = "info";
 	private static String EditExistingPermission = "edit_existing";
 
-	private IWBundle iwb;
-	private IWResourceBundle iwrb;
+	protected IWBundle iwb;
+	protected IWResourceBundle iwrb;
 
 	public static final int SINGLE_FILE_LAYOUT = NewsLayoutHandler.SINGLE_FILE_LAYOUT;
 	public static final int NEWS_SITE_LAYOUT = NewsLayoutHandler.NEWS_SITE_LAYOUT;
@@ -147,16 +150,17 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 	public static final int SINGLE_LINE_LAYOUT = NewsLayoutHandler.SINGLE_LINE_LAYOUT;
 	public static final int COLLECTION_LAYOUT = NewsLayoutHandler.COLLECTION_LAYOUT;
 
-	private int iLayout = SINGLE_FILE_LAYOUT;
+	protected int iLayout = SINGLE_FILE_LAYOUT;
 
-	private int visibleNewsRangeStart = 0;
-	private int visibleNewsRangeEnd = Integer.MAX_VALUE;
-	private boolean setHeadlineLinktToCategoryMainViewerPage = false;
+	protected int visibleNewsRangeStart = 0;
+	protected int visibleNewsRangeEnd = Integer.MAX_VALUE;
+	protected boolean setHeadlineLinktToCategoryMainViewerPage = false;
 	private boolean showCategoryInSingleLineView = false;
 	private String moreAndBackStyleClass;
 	private String moreStyleClass;
 	private String backStyleClass;
 	private String CollectionLinkStyleClass = null;
+	protected String dateFormat = null;
 
 	public NewsReader() {
 		setCacheable(getCacheKey(), 999999999);// cache indefinately
@@ -497,7 +501,7 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 		return T;
 	}
 
-	private PresentationObject publishNews(IWContext iwc, Locale locale, boolean collection) {
+	protected PresentationObject publishNews(IWContext iwc, Locale locale, boolean collection) {
 		List L = null;
 		if (this.iLayout == COLLECTION_LAYOUT || collection) {
 			L = NewsFinder.listOfAllNewsHelpersInCategory(getCategoryIds(), this.numberOfCollectionNews, locale);
@@ -562,7 +566,7 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 		return (T);
 	}
 
-	private Table getCollectionTable(IWContext iwc, int iCollectionCategoryId) {
+	protected PresentationObject getCollectionTable(IWContext iwc, int iCollectionCategoryId) {
 		Table smallTable = new Table(1, 1);
 		smallTable.setCellpadding(0);
 		smallTable.setCellspacing(0);
@@ -584,7 +588,7 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 		return smallTable;
 	}
 
-	public Table getBackTable(IWContext iwc) {
+	public PresentationObject getBackTable(IWContext iwc) {
 		Table smallTable = new Table(1, 1);
 		smallTable.setCellpadding(0);
 		smallTable.setCellspacing(0);
@@ -601,7 +605,7 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 
 	}
 
-	private Link getCollectionLink(PresentationObject obj, int iCategoryId, IWContext iwc) {
+	protected Link getCollectionLink(PresentationObject obj, int iCategoryId, IWContext iwc) {
 		Link collectionLink = new Link(obj);
 		checkFromPage(collectionLink);
 		collectionLink.addParameter(prmNewsCategoryId, iCategoryId);
@@ -612,12 +616,12 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 		return collectionLink;
 	}
 
-	private boolean isFromCollectionLink(IWContext iwc) {
+	protected boolean isFromCollectionLink(IWContext iwc) {
 		return iwc.isParameterSet(prmCollection + getInstanceIDString(iwc));
 	}
 
 	// Make a table around each news
-	private PresentationObject getNewsTable(NewsHelper newsHelper, Locale locale, boolean showAll, boolean collection, IWContext iwc, boolean isLastNews) {
+	protected PresentationObject getNewsTable(NewsHelper newsHelper, Locale locale, boolean showAll, boolean collection, IWContext iwc, boolean isLastNews) {
 
 		Table T = new Table();
 		T.setCellpadding(0);
@@ -841,7 +845,7 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 		return T;
 	}
 
-	private Link getMoreLink(PresentationObject obj, int newsId, IWContext iwc) {
+	protected Link getMoreLink(PresentationObject obj, int newsId, IWContext iwc) {
 		Link moreLink = new Link(obj);
 		if (this.moreStyleClass != null) {
 			moreLink.setStyle(this.moreStyleClass);
@@ -857,7 +861,7 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 		return moreLink;
 	}
 
-	private Text getLinkToCategoryMainViewerPage(Text obj, NwNews news, IWContext iwc) {
+	protected Text getLinkToCategoryMainViewerPage(Text obj, NwNews news, IWContext iwc) {
 		Link categoryPageLink = new Link(obj);
 		checkFromPage(categoryPageLink);
 
@@ -883,7 +887,7 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 		return categoryPageLink;
 	}
 
-	private Link getBackLink(PresentationObject obj) {
+	protected Link getBackLink(PresentationObject obj) {
 		Link backLink = new Link(obj);
 		if (this.backStyleClass != null) {
 			backLink.setStyle(this.backStyleClass);
@@ -895,7 +899,7 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 		return backLink;
 	}
 
-	private PresentationObject getNewsAdminPart(NwNews news, IWContext iwc) {
+	protected PresentationObject getNewsAdminPart(NwNews news, IWContext iwc) {
 		Table links = new Table(3, 1);
 		Link newsEdit = new Link(this.iwb.getImage("/shared/edit.gif"));
 		newsEdit.setWindowToOpen(NewsEditorWindow.class);
@@ -1012,13 +1016,13 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 		return tempText;
 	}
 
-	private Text setInformationAttributes(Text realText) {
+	protected Text setInformationAttributes(Text realText) {
 		Text tempText = (Text) this.informationProxy.clone();
 		tempText.setText(realText.getText());
 		return tempText;
 	}
 
-	private Text setMoreAttributes(Text realText) {
+	protected Text setMoreAttributes(Text realText) {
 		Text tempText = (Text) this.moreProxy.clone();
 		tempText.setText(realText.getText());
 		return tempText;
@@ -1420,7 +1424,7 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 		return cacheStatePrefix + returnString;
 	}
 
-	private PresentationObject getNewsImage(NewsHelper newsHelper, String headline) {
+	protected PresentationObject getNewsImage(NewsHelper newsHelper, String headline) {
 		List files = newsHelper.getContentHelper().getFiles();
 		if (files != null && !files.isEmpty()) {
 			try {
@@ -1571,5 +1575,9 @@ public class NewsReader extends CategoryBlock implements Builderaware {
 	 */
 	public void setMoreStyleClass(String moreStyleClass) {
 		this.moreStyleClass = moreStyleClass;
+	}
+	
+	public void setDateFormat(String dateFormat) {
+		this.dateFormat = dateFormat;
 	}
 }
