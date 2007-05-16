@@ -27,6 +27,7 @@ import com.idega.util.text.TextSoap;
 public class NewsReaderCSS extends NewsReader {
 
 	private final static String ATTRIBUTE_AUTHOR = "author";
+	private final static String ATTRIBUTE_CATEGORY = "category";
 	private final static String ATTRIBUTE_CREATION_DATE = "creation_date";
 	private final static String ATTRIBUTE_HEADLINE = "headline";
 	private final static String ATTRIBUTE_TEASER = "teaser";
@@ -39,14 +40,15 @@ public class NewsReaderCSS extends NewsReader {
 	public NewsReaderCSS() {
 		super();
 	}
+
 	public NewsReaderCSS(int iCategoryId) {
 		super(iCategoryId);
 	}
-	
+
 	protected boolean isCacheable(IWContext iwc) {
 		return false;
 	}
-	
+
 	protected PresentationObject publishNews(IWContext iwc, Locale locale, boolean collection) {
 		List L = null;
 		if (this.iLayout == COLLECTION_LAYOUT || collection) {
@@ -60,7 +62,7 @@ public class NewsReaderCSS extends NewsReader {
 
 		// int count = NewsFinder.countNewsInCategory(newsCategory.getID());
 		// System.err.println(" news count "+count);
-//		boolean useDividedTable = this.iLayout == NEWS_SITE_LAYOUT ? true : false;
+// boolean useDividedTable = this.iLayout == NEWS_SITE_LAYOUT ? true : false;
 		if (L != null) {
 			int len = Math.min(this.visibleNewsRangeEnd, L.size());
 			Integer I;
@@ -77,19 +79,20 @@ public class NewsReaderCSS extends NewsReader {
 					l.add((PresentationObject) this.objectsBetween.get(I));
 					this.objectsBetween.remove(I);
 				}
-				
+
 				Layer newsL = (Layer) getNewsTable(newsHelper, locale, false, collection, iwc, (i + 1) == len);
 				if (i == startI) {
 					newsL.setStyleClass("article_item_first");
 				}
-				
+
 				if (i % 2 == 0) {
 					newsL.setStyleClass("article_item_odd");
-				} else {
+				}
+				else {
 					newsL.setStyleClass("article_item_even");
 				}
-				
-				if (i == (len -1)) {
+
+				if (i == (len - 1)) {
 					newsL.setStyleClass("article_item_last");
 				}
 				l.add(newsL);
@@ -137,13 +140,14 @@ public class NewsReaderCSS extends NewsReader {
 		return smallTable;
 
 	}
-	
+
 	protected PresentationObject getNewsTable(NewsHelper newsHelper, Locale locale, boolean showAll, boolean collection, IWContext iwc, boolean isLastNews) {
 		Layer layer = new Layer();
 		layer.setStyleClass(DEFAULT_STYLE_CLASS);
-		
+
 		ContentHelper contentHelper = newsHelper.getContentHelper();
 		NwNews news = newsHelper.getNwNews();
+		String categoryName = news.getNewsCategory().getName(locale);
 		LocalizedText locText = contentHelper.getLocalizedText(locale);
 
 		String sNewsBody = "";
@@ -151,7 +155,7 @@ public class NewsReaderCSS extends NewsReader {
 		String sTeaser = "";
 
 		Layer authL = new Layer();
-		authL.setStyleClass(styleClassPrefix+ATTRIBUTE_AUTHOR);
+		authL.setStyleClass(styleClassPrefix + ATTRIBUTE_AUTHOR);
 		String author = news.getAuthor();
 		if (author != null) {
 			authL.add(author);
@@ -160,24 +164,32 @@ public class NewsReaderCSS extends NewsReader {
 
 		Timestamp newsDate = newsHelper.getContentHelper().getContent().getCreated();
 		Layer dateL = new Layer();
-		dateL.setStyleClass(styleClassPrefix+ATTRIBUTE_CREATION_DATE);
+		dateL.setStyleClass(styleClassPrefix + ATTRIBUTE_CREATION_DATE);
 		if (newsDate != null) {
 			IWTimestamp s = new IWTimestamp(newsDate);
 			if (dateFormat != null) {
 				dateL.add(s.getDateString(dateFormat));
-			} else {
+			}
+			else {
 				dateL.add(s.getLocaleDate(locale));
 			}
 		}
 		layer.add(dateL);
 
 		Layer sourceL = new Layer();
-		sourceL.setStyleClass(styleClassPrefix+ATTRIBUTE_SOURCE);
+		sourceL.setStyleClass(styleClassPrefix + ATTRIBUTE_SOURCE);
 		String source = news.getSource();
 		if (source != null) {
 			sourceL.add(source);
 		}
 		layer.add(sourceL);
+
+		Layer categoryL = new Layer();
+		categoryL.setStyleClass(styleClassPrefix + ATTRIBUTE_CATEGORY);
+		if (categoryName != null) {
+			sourceL.add(categoryName);
+		}
+		layer.add(categoryL);
 
 		if (locText != null) {
 			sHeadline = locText.getHeadline();
@@ -187,16 +199,15 @@ public class NewsReaderCSS extends NewsReader {
 			sNewsBody = locText.getBody();
 			sNewsBody = sNewsBody == null ? "" : sNewsBody;
 		}
-		
-//		boolean needMoreButton = collection;
-//		if (!showAll && this.numberOfHeadlineLetters > -1 && sHeadline.length() >= this.numberOfHeadlineLetters) {
-//			sHeadline = sHeadline.substring(0, this.numberOfHeadlineLetters) + "...";
-//			needMoreButton = true;
-//		}
 
-		
+// boolean needMoreButton = collection;
+// if (!showAll && this.numberOfHeadlineLetters > -1 && sHeadline.length() >= this.numberOfHeadlineLetters) {
+// sHeadline = sHeadline.substring(0, this.numberOfHeadlineLetters) + "...";
+// needMoreButton = true;
+// }
+
 		Layer headlineL = new Layer();
-		headlineL.setStyleClass(styleClassPrefix+ATTRIBUTE_HEADLINE);
+		headlineL.setStyleClass(styleClassPrefix + ATTRIBUTE_HEADLINE);
 		Text headLine = new Text(sHeadline);
 		if (this.headlineAsLink) {
 			if (this.setHeadlineLinktToCategoryMainViewerPage) {
@@ -213,33 +224,33 @@ public class NewsReaderCSS extends NewsReader {
 
 		if (showTeaserText) {
 			Layer teaserL = new Layer();
-			teaserL.setStyleClass(styleClassPrefix+ATTRIBUTE_TEASER);
+			teaserL.setStyleClass(styleClassPrefix + ATTRIBUTE_TEASER);
 			teaserL.add(sTeaser);
 			layer.add(teaserL);
 		}
 
 		Layer bodyL = new Layer();
-		bodyL.setStyleClass(styleClassPrefix+ATTRIBUTE_BODY);
+		bodyL.setStyleClass(styleClassPrefix + ATTRIBUTE_BODY);
 		bodyL.add(sNewsBody);
 		layer.add(bodyL);
 
 		PresentationObject po = getNewsImage(newsHelper, sHeadline);
 		if (po != null) {
 			Layer imageL = new Layer();
-			imageL.setStyleClass(styleClassPrefix+ATTRIBUTE_IMAGE);
+			imageL.setStyleClass(styleClassPrefix + ATTRIBUTE_IMAGE);
 			imageL.add(po);
 			layer.add(imageL);
 		}
-		
+
 		// //////// MORE LINK ///////////////
 
 		if (!showAll) {
 			Layer l = new Layer();
-			l.setStyleClass(styleClassPrefix+"MORE");
-				Text tMore = new Text(iwrb.getLocalizedString("more", "More"));
-				tMore = setMoreAttributes(tMore);
-				l.add(getMoreLink(tMore, news.getID(), iwc));
-				layer.add(l);
+			l.setStyleClass(styleClassPrefix + "MORE");
+			Text tMore = new Text(iwrb.getLocalizedString("more", "More"));
+			tMore = setMoreAttributes(tMore);
+			l.add(getMoreLink(tMore, news.getID(), iwc));
+			layer.add(l);
 		}
 
 		// ////////// ADMIN PART /////////////////////
@@ -247,22 +258,22 @@ public class NewsReaderCSS extends NewsReader {
 		if (this.hasEdit || this.hasEditExisting || (this.hasAdd && (ownerId == iwc.getUserId()))) {
 			layer.add(getNewsAdminPart(news, iwc));
 		}
-		
+
 		return layer;
 	}
-	
+
 	protected PresentationObject getNewsAdminPart(NwNews news, IWContext iwc) {
 		Layer l = new Layer();
-		l.setStyleClass(styleClassPrefix+"ADMIN");
+		l.setStyleClass(styleClassPrefix + "ADMIN");
 		Link newsEdit = new Link(iwb.getImage("/shared/edit.gif"));
 		newsEdit.setWindowToOpen(NewsEditorWindow.class);
 		newsEdit.addParameter(NewsEditorWindow.prmNwNewsId, news.getID());
 		newsEdit.addParameter(NewsEditorWindow.prmObjInstId, getICObjectInstanceID());
-	
+
 		Link newsDelete = new Link(this.iwb.getImage("/shared/delete.gif"));
 		newsDelete.setWindowToOpen(NewsEditorWindow.class);
 		newsDelete.addParameter(NewsEditorWindow.prmDelete, news.getID());
-	
+
 		l.add(newsEdit);
 		l.add(newsDelete);
 		return l;
@@ -273,7 +284,8 @@ public class NewsReaderCSS extends NewsReader {
 		l.setStyleClass("collectionLinkLayer");
 		if (this.collectionImage != null) {
 			l.add(getCollectionLink(this.collectionImage, iCollectionCategoryId, iwc));
-		} else {
+		}
+		else {
 			Text collText = new Text(this.iwrb.getLocalizedString("collection", "Collection"));
 			if (this.showCollectionText) {
 				collText = setInformationAttributes(collText);
@@ -282,7 +294,6 @@ public class NewsReaderCSS extends NewsReader {
 		}
 		return l;
 	}
-	
 
 	protected PresentationObject getNewsImage(NewsHelper newsHelper, String headline) {
 		List files = newsHelper.getContentHelper().getFiles();
@@ -307,5 +318,5 @@ public class NewsReaderCSS extends NewsReader {
 		}
 		return null;
 	}
-	
+
 }
