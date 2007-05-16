@@ -229,17 +229,19 @@ public class NewsReaderCSS extends NewsReader {
 			layer.add(teaserL);
 		}
 
-		Layer bodyL = new Layer();
-		bodyL.setStyleClass(styleClassPrefix + ATTRIBUTE_BODY);
-		bodyL.add(sNewsBody);
-		layer.add(bodyL);
+		if (!collection) {
+			Layer bodyL = new Layer();
+			bodyL.setStyleClass(styleClassPrefix + ATTRIBUTE_BODY);
+			bodyL.add(sNewsBody);
+			layer.add(bodyL);
 
-		PresentationObject po = getNewsImage(newsHelper, sHeadline);
-		if (po != null) {
-			Layer imageL = new Layer();
-			imageL.setStyleClass(styleClassPrefix + ATTRIBUTE_IMAGE);
-			imageL.add(po);
-			layer.add(imageL);
+			PresentationObject po = getNewsImage(newsHelper, sHeadline);
+			if (po != null) {
+				Layer imageL = new Layer();
+				imageL.setStyleClass(styleClassPrefix + ATTRIBUTE_IMAGE);
+				imageL.add(po);
+				layer.add(imageL);
+			}
 		}
 
 		// //////// MORE LINK ///////////////
