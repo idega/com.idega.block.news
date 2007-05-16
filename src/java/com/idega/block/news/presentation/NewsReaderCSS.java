@@ -45,10 +45,6 @@ public class NewsReaderCSS extends NewsReader {
 		super(iCategoryId);
 	}
 
-	protected boolean isCacheable(IWContext iwc) {
-		return false;
-	}
-
 	protected PresentationObject publishNews(IWContext iwc, Locale locale, boolean collection) {
 		List L = null;
 		if (this.iLayout == COLLECTION_LAYOUT || collection) {
