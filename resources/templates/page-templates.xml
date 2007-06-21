@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<page-templates>
+	<page name="NewsReader (CSS)" type="news" iconfile="idegaweb/bundles/com.idega.block.news.bundle/resources/images/pageIcons/news.png" templatefile="idegaweb/bundles/com.idega.block.news.bundle/resources/pages/idega_theme_news.xml"></page>
+</page-templates>

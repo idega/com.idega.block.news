@@ -1,5 +1,5 @@
 /*
- * $Id: NewsLayoutHandler.java,v 1.6 2004/06/28 14:07:44 thomas Exp $
+ * $Id: NewsLayoutHandler.java,v 1.7 2007/06/21 10:17:58 valdas Exp $
  *
  * Copyright (C) 2001 Idega hf. All Rights Reserved.
  *
@@ -43,7 +43,7 @@ public class NewsLayoutHandler implements ICPropertyHandler {
   /**
    *
    */
-  public PresentationObject getHandlerObject(String name, String value, IWContext iwc) {
+  public PresentationObject getHandlerObject(String name, String value, IWContext iwc, boolean oldGenerationHandler, String instanceId, String method) {
     DropdownMenu menu = new DropdownMenu(name);
     menu.addMenuElement("","Select:");
     menu.addMenuElement(SINGLE_FILE_LAYOUT ,"SINGLEFILE");
@@ -60,4 +60,5 @@ public class NewsLayoutHandler implements ICPropertyHandler {
    */
   public void onUpdate(String values[], IWContext iwc) {
   }
+
 }
