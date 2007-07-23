@@ -37,7 +37,9 @@ import com.idega.idegaweb.IWBundleStartable;
 public class NewsBundleStarter implements IWBundleStartable{
 
   public void start(IWBundle bundle){
-    start();
+    
+	  //THIS WAS SOME OLD SQL FIXES not needed and invalidated some cache.
+	  //start();
   }
 
   public void start(){
