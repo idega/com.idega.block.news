@@ -1,5 +1,5 @@
 /*
- * $Id: NewsLayoutHandler.java,v 1.9 2007/07/23 17:08:27 justinas Exp $
+ * $Id: NewsLayoutHandler.java,v 1.10 2007/07/23 23:16:46 gimmi Exp $
  *
  * Copyright (C) 2001 Idega hf. All Rights Reserved.
  *
@@ -62,6 +62,10 @@ public class NewsLayoutHandler implements ICPropertyHandler {
 	 * 
 	 */
 	public void onUpdate(String values[], IWContext iwc) {
+	}
+
+	public PresentationObject getHandlerObject(String name, String stringValue,	IWContext iwc) {
+		return getHandlerObject(name, stringValue, iwc, true, null, null);
 	}
 
 }
