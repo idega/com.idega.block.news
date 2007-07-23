@@ -1,5 +1,5 @@
 /*
- * $Id: NewsLayoutHandler.java,v 1.8 2007/07/18 16:13:05 laddi Exp $
+ * $Id: NewsLayoutHandler.java,v 1.9 2007/07/23 17:08:27 justinas Exp $
  *
  * Copyright (C) 2001 Idega hf. All Rights Reserved.
  *
@@ -44,7 +44,9 @@ public class NewsLayoutHandler implements ICPropertyHandler {
 	/**
 	 * 
 	 */
-	public PresentationObject getHandlerObject(String name, String value, IWContext iwc) {
+	 // while using commented source code it throws error on felixclub server
+// 	public PresentationObject getHandlerObject(String name, String value, IWContext iwc) {
+	public PresentationObject getHandlerObject(String name, String value, IWContext iwc, boolean oldGenerationHandler, String instanceId, String method) {
 		DropdownMenu menu = new DropdownMenu(name);
 		menu.addMenuElement("", "Select:");
 		menu.addMenuElement(SINGLE_FILE_LAYOUT, "SINGLEFILE");
