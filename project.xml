@@ -5,7 +5,7 @@
   <pomVersion>3</pomVersion>
   <name>idegaWeb News Block</name>
   <artifactId>com.idega.block.news</artifactId>
-  <currentVersion>3.1.2</currentVersion>
+  <currentVersion>3.1.3</currentVersion>
   <shortDescription>News block</shortDescription>
   <versions>
     <version>
