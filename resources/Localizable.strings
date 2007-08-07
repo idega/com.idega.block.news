@@ -11,6 +11,7 @@ headline=Headline
 image=Image
 images=Images
 iw.component.com.idega.block.news.presentation.NewsReader.name=News
+iw.component.com.idega.block.news.presentation.NewsReaderCSS.name=NewsReaderCSS
 letters=Letters
 locale=Locale
 more=More
