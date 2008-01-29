@@ -9,7 +9,7 @@
 	<groupId>com.idega.block.legacy</groupId>
  	<name>idegaWeb News Block</name>
 	<artifactId>com.idega.block.news</artifactId>
-	<version>4.0.0</version>
+	<version>4.0.1-SNAPSHOT</version>
 	<inceptionYear>2007</inceptionYear>
 	<description>News block</description>
 	<scm>
@@ -19,7 +19,6 @@
 		-->
 		<connection>scm:cvs:ext:valdas@code.idega.com:/idega/cvs:com.idega.block.legacy/com.idega.block.news/</connection>
 		<developerConnection>scm:cvs:ext:valdas@code.idega.com:/idega/cvs:com.idega.block.legacy/com.idega.block.news/</developerConnection>
-    <tag>com_idega_block_addon_super-4_0_0</tag>
   </scm>
 	<dependencies>
 		<dependency>
@@ -43,13 +42,13 @@
 		<dependency>
 			<groupId>com.idega.block.legacy</groupId>
       		<artifactId>com.idega.block.text</artifactId>
-      		<version>4.0.0</version>
+      		<version>4.0.1-SNAPSHOT</version>
       		<type>jar</type>
 		</dependency>
 		<dependency>
 			<groupId>com.idega.block.legacy</groupId>
       		<artifactId>com.idega.block.category</artifactId>
-      		<version>4.0.0</version>
+      		<version>4.0.1-SNAPSHOT</version>
       		<type>jar</type>
 		</dependency>
 	</dependencies>
