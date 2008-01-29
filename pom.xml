@@ -19,6 +19,7 @@
 		-->
 		<connection>scm:cvs:ext:valdas@code.idega.com:/idega/cvs:com.idega.block.legacy/com.idega.block.news/</connection>
 		<developerConnection>scm:cvs:ext:valdas@code.idega.com:/idega/cvs:com.idega.block.legacy/com.idega.block.news/</developerConnection>
+    <tag>com_idega_block_addon_super-4_0_0</tag>
   </scm>
 	<dependencies>
 		<dependency>
