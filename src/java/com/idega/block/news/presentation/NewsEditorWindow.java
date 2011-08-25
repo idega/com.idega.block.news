@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.idega.block.category.business.CategoryFinder;
 import com.idega.block.category.data.ICCategoryBMPBean;
 import com.idega.block.media.presentation.ImageInserter;
@@ -21,6 +23,7 @@ import com.idega.block.text.business.ContentFinder;
 import com.idega.block.text.business.ContentHelper;
 import com.idega.block.text.data.Content;
 import com.idega.block.text.data.LocalizedText;
+import com.idega.block.web2.business.Web2Business;
 import com.idega.core.file.data.ICFile;
 import com.idega.core.localisation.business.ICLocaleBusiness;
 import com.idega.core.localisation.presentation.ICLocalePresentation;
@@ -34,7 +37,6 @@ import com.idega.presentation.Image;
 import com.idega.presentation.Table;
 import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
-import com.idega.presentation.texteditor.TextEditor;
 import com.idega.presentation.ui.CloseButton;
 import com.idega.presentation.ui.DropdownMenu;
 import com.idega.presentation.ui.HiddenInput;
@@ -44,6 +46,8 @@ import com.idega.presentation.ui.TextArea;
 import com.idega.presentation.ui.TextInput;
 import com.idega.presentation.ui.TimestampInput;
 import com.idega.util.IWTimestamp;
+import com.idega.util.PresentationUtil;
+import com.idega.util.expression.ELUtil;
 
 /**
  * Title: Description: Copyright: Copyright (c) 2000-2001 idega.is All Rights Reserved Company: idega
@@ -101,13 +105,16 @@ public class NewsEditorWindow extends IWAdminWindow {
 
 	private String sEditor, sHeadline, sTeaser, sNews, sNewsDate, sCategory, sAuthor, sSource, /* sDaysShown, sImage, */sLocale, sPublisFrom, sPublisTo;
 
+	@Autowired
+	private Web2Business web2Business;
+	
 	// private int attributeId = 3;
 	private IWBundle iwb, core;
 	private IWResourceBundle iwrb;
 
 	public NewsEditorWindow() {
-		setWidth(570);
-		setHeight(700);
+		setWidth(900);
+		setHeight(800);
 		setResizable(true);
 		setScrollbar(true);
 		setUnMerged();
@@ -206,6 +213,10 @@ public class NewsEditorWindow extends IWAdminWindow {
 				 */
 				// doView = false;
 				if (doView) {
+					PresentationUtil.addJavaScriptSourceLineToHeader(iwc, getWeb2Business().getJQuery().getBundleURIToJQueryLib());
+					PresentationUtil.addJavaScriptSourceLineToHeader(iwc, iwb.getVirtualPathWithFileNameString("js/tiny_mce/jquery.tinymce.js"));
+					PresentationUtil.addJavaScriptSourceLineToHeader(iwc, iwb.getVirtualPathWithFileNameString("js/newsEditor.js"));
+					
 					doViewNews(this.sNewsId, sAttribute, chosenLocale, iLocaleId, this.iCategoryId);
 				}
 			}
@@ -498,12 +509,12 @@ public class NewsEditorWindow extends IWAdminWindow {
 		LocaleDrop.setToSubmit();
 		LocaleDrop.setSelectedElement(Integer.toString(iLocaleId));
 
-		// TextArea taBody = new TextArea(prmBody,65,18);
-		TextEditor taBody = new TextEditor();
-		taBody.setInputName(prmBody);
-		taBody.setHeight("230");
+		TextArea taBody = new TextArea(prmBody, 90, 30);
+		taBody.setStyleClass("tinymce");
+		//TextEditor taBody = new TextEditor();
+		//taBody.setInputName(prmBody);
 
-		TextArea taTeaser = new TextArea(prmTeaser, 65, 2);
+		TextArea taTeaser = new TextArea(prmTeaser, 90, 2);
 
 		List cats = CategoryFinder.getInstance().listOfCategoryForObjectInstanceId(iObjInsId);
 		DropdownMenu catDrop = new DropdownMenu(cats, prmCategory);
@@ -725,5 +736,13 @@ public class NewsEditorWindow extends IWAdminWindow {
 
 	public String getBundleIdentifier() {
 		return IW_BUNDLE_IDENTIFIER;
+	}
+
+	protected Web2Business getWeb2Business() {
+		if (web2Business == null) {
+			ELUtil.getInstance().autowire(this);
+		}
+		
+		return web2Business;
 	}
 }
