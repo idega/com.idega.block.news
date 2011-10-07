@@ -24,7 +24,6 @@ import com.idega.block.text.data.LocalizedText;
 import com.idega.core.file.data.ICFile;
 import com.idega.core.localisation.business.ICLocaleBusiness;
 import com.idega.core.localisation.presentation.ICLocalePresentation;
-import com.idega.core.user.data.User;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.idegaweb.block.presentation.Builderaware;
@@ -47,7 +46,7 @@ import com.idega.util.IWTimestamp;
 
 /**
  * Title: Description: Copyright: Copyright (c) 2000-2001 idega.is All Rights Reserved Company: idega
- * 
+ *
  * @author <a href="mailto:aron@idega.is">Aron Birkir</a>
  * @version 1.1
  */
@@ -58,7 +57,7 @@ public class NewsEditorWindow extends IWAdminWindow {
 	// private String Error;
 	private boolean isAdmin = false;
 	private int iUserId = -1;
-	private User eUser = null;
+	private com.idega.user.data.bean.User eUser = null;
 	private int iObjInsId = -1;
 	// private int defaultPublishDays = 50;
 	private int SAVECATEGORY = 1, SAVENEWS = 2;
@@ -406,53 +405,53 @@ public class NewsEditorWindow extends IWAdminWindow {
 
 	/*
 	 * private void addCategoryFields(ICCategory newsCategory, int iObjInst) {
-	 * 
+	 *
 	 * String sCategory = this.iwrb.getLocalizedString("category", "Category"); String sName = this.iwrb.getLocalizedString("name", "Name"); String
 	 * sDesc = this.iwrb.getLocalizedString("description", "Description"); String sMoveCat = this.iwrb.getLocalizedString("movenews", "Move news to");
-	 * 
+	 *
 	 * List L = NewsFinder.listOfValidNewsCategories(); DropdownMenu catDrop = new DropdownMenu(L, prmCategory); catDrop.addMenuElementFirst("-1",
 	 * sCategory); catDrop.setToSubmit(); DropdownMenu MoveCatDrop = new DropdownMenu(L, prmMoveToCat); MoveCatDrop.addMenuElementFirst("-1",
 	 * sCategory);
-	 * 
+	 *
 	 * Link newLink = new Link(this.iwb.getImage("/shared/create.gif")); newLink.addParameter(prmCategory, -1); newLink.addParameter(prmObjInstId,
 	 * iObjInst); newLink.addParameter(prmFormProcess, "C");
-	 * 
+	 *
 	 * boolean hasCategory = newsCategory != null ? true : false; TextInput tiName = new TextInput(prmCatName); tiName.setLength(40);
 	 * tiName.setMaxlength(255);
-	 * 
+	 *
 	 * Table catTable = new Table(5, 1); catTable.setCellpadding(0); catTable.setCellspacing(0); setStyle(catDrop); catTable.add(catDrop, 1, 1);
 	 * catTable.add(newLink, 3, 1); catTable.setWidth(2, 1, "20"); catTable.setWidth(4, 1, "20");
-	 * 
+	 *
 	 * TextArea taDesc = new TextArea(prmCatDesc, 65, 5); if (hasCategory) { int id = newsCategory.getID();
 	 * catDrop.setSelectedElement(String.valueOf(newsCategory.getID())); if (newsCategory.getName() != null) {
 	 * tiName.setContent(newsCategory.getName()); } if (newsCategory.getDescription() != null) { taDesc.setContent(newsCategory.getDescription()); }
 	 * addHiddenInput(new HiddenInput(prmCategory, String.valueOf(id)));
-	 * 
+	 *
 	 * int iNewsCount = NewsFinder.countNewsInCategory(id); int iUnPublishedCount = NewsFinder.countNewsInCategory(id, NewsFinder.UNPUBLISHED); int
 	 * iPublishingCount = NewsFinder.countNewsInCategory(id, NewsFinder.PUBLISHISING); int iPublishedCount = NewsFinder.countNewsInCategory(id,
 	 * NewsFinder.PUBLISHED);
-	 * 
+	 *
 	 * String sNewsCount = this.iwrb.getLocalizedString("newscount", "News count"); String sUnPublishedCount =
 	 * this.iwrb.getLocalizedString("unpublished", "Unpublished"); String sPublishingCount = this.iwrb.getLocalizedString("publishing", "In publish");
 	 * String sPublishedCount = this.iwrb.getLocalizedString("published", "Published");
-	 * 
+	 *
 	 * Table table = new Table(3, 4); table.setCellpadding(2); table.setCellspacing(1); table.setWidth(2, "10"); String colon = " : ";
 	 * table.add(formatText(sNewsCount + colon), 1, 1); table.add(String.valueOf(iNewsCount), 3, 1); table.add(formatText(sUnPublishedCount + colon), 1,
 	 * 2); table.add(String.valueOf(iUnPublishedCount), 3, 2); table.add(formatText(sPublishingCount + colon), 1, 3);
 	 * table.add(String.valueOf(iPublishingCount), 3, 3); table.add(formatText(sPublishedCount + colon), 1, 4);
 	 * table.add(String.valueOf(iPublishedCount), 3, 4);
-	 * 
+	 *
 	 * String sInfo = this.iwrb.getLocalizedString("info", "Info"); addRight(sInfo, table, false, false);
-	 * 
+	 *
 	 * if (iNewsCount == 0) { Link deleteLink = new Link(this.iwb.getImage("/shared/delete.gif")); deleteLink.addParameter(actDelete, "true");
 	 * deleteLink.addParameter(prmCategory, newsCategory.getID()); deleteLink.addParameter(prmObjInstId, iObjInst);
 	 * deleteLink.addParameter(prmFormProcess, "C");
-	 * 
+	 *
 	 * catTable.add(deleteLink, 5, 1); } }
-	 * 
+	 *
 	 * addLeft(sCategory, catTable, true, false); addLeft(sName, tiName, true); addLeft(sDesc, taDesc, true); if (hasCategory) { addLeft(sMoveCat,
 	 * MoveCatDrop, true); }
-	 * 
+	 *
 	 * SubmitButton save = new SubmitButton(this.iwrb.getLocalizedImageButton("save", "Save"), actSave); SubmitButton close = new
 	 * SubmitButton(this.iwrb.getLocalizedImageButton("close", "Close"), actClose); addSubmitButton(save); addSubmitButton(close); addHiddenInput(new
 	 * HiddenInput(prmObjInstId, String.valueOf(iObjInst))); addHiddenInput(new HiddenInput(prmFormProcess, "C")); }
@@ -710,12 +709,13 @@ public class NewsEditorWindow extends IWAdminWindow {
 	 * drp.addDisabledMenuElement("", ""); return drp; } }
 	 */
 
+	@Override
 	public void main(IWContext iwc) throws Exception {
 		super.main(iwc);
 
 		this.isAdmin = true;
 		this.eUser = com.idega.core.accesscontrol.business.LoginBusinessBean.getUser(iwc);
-		this.iUserId = this.eUser != null ? this.eUser.getID() : -1;
+		this.iUserId = this.eUser != null ? this.eUser.getId() : -1;
 		this.iwb = getBundle(iwc);
 		this.iwrb = getResourceBundle(iwc);
 		this.core = iwc.getIWMainApplication().getBundle(Builderaware.IW_CORE_BUNDLE_IDENTIFIER);
@@ -723,6 +723,7 @@ public class NewsEditorWindow extends IWAdminWindow {
 		control(iwc);
 	}
 
+	@Override
 	public String getBundleIdentifier() {
 		return IW_BUNDLE_IDENTIFIER;
 	}
