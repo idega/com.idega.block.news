@@ -189,7 +189,7 @@ public class NwNewsBMPBean extends com.idega.data.GenericEntity implements  NwNe
       return this.idoGetRelatedEntities(LocalizedText.class);
   }
 
-  public Collection ejbFindPublishedByCategoriesAndLocale(int[] newsCategoryIds,int iLocaleId,boolean ignorePublishingDates)throws FinderException{
+  public Collection ejbFindPublishedByCategoriesAndLocale(int[] newsCategoryIds,int iLocaleId,boolean ignorePublishingDates,int maxNumberOfNews)throws FinderException{
       String middleTable = ((com.idega.block.text.data.ContentHome)com.idega.data.IDOLookup.getHomeLegacy(Content.class)).createLegacy().getLocalizedTextMiddleTableName(((com.idega.block.text.data.LocalizedTextHome)com.idega.data.IDOLookup.getHomeLegacy(LocalizedText.class)).createLegacy(),((com.idega.block.text.data.ContentHome)com.idega.data.IDOLookup.getHomeLegacy(Content.class)).createLegacy());
       Table news = new Table(com.idega.block.news.data.NwNewsBMPBean.getEntityTableName(), "n");
       Table content = new Table(com.idega.block.text.data.ContentBMPBean.getEntityTableName(), "c");
@@ -214,7 +214,8 @@ public class NwNewsBMPBean extends com.idega.data.GenericEntity implements  NwNe
       	query.addCriteria(new AND(from, to));
       }
       query.addOrder(content, ContentBMPBean.getColumnNameCreated(), false);
-      return idoFindPKsByQuery(query);
+      
+      return idoFindPKsByQuery(query, maxNumberOfNews);
   }
 
   public Collection ejbFindPublishedByCategory(int newsCategoryId,boolean ignorePublishingDates)throws FinderException{

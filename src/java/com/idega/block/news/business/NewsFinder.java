@@ -41,20 +41,20 @@ public class NewsFinder {
 
   public static List listOfAllNwNewsInCategory(int[] newsCategoryId,Locale locale){
     int iLocaleId = getLocaleId(locale);
-    return listOfPublishingNews(newsCategoryId,iLocaleId ,true);
+    return listOfPublishingNews(newsCategoryId,iLocaleId ,true, -1);
   }
 
   public static List listOfNwNewsInCategory(int[] newsCategoryId,Locale locale){
     int iLocaleId = getLocaleId(locale);
-    return listOfPublishingNews(newsCategoryId,iLocaleId,false);
+    return listOfPublishingNews(newsCategoryId,iLocaleId,false, -1);
   }
 
   public static List listOfAllNwNewsInCategory(int[] newsCategoryId,int iLocaleId){
-    return listOfPublishingNews(newsCategoryId,iLocaleId ,true);
+    return listOfPublishingNews(newsCategoryId,iLocaleId ,true, -1);
   }
 
-  public static List listOfNwNewsInCategory(int[] newsCategoryId,int iLocaleId){
-    return listOfPublishingNews(newsCategoryId,iLocaleId,false);
+  public static List listOfNwNewsInCategory(int[] newsCategoryId,int iLocaleId, int maxNumberOfNews){
+    return listOfPublishingNews(newsCategoryId,iLocaleId,false, maxNumberOfNews);
   }
 
   public static List listOfAllNwNewsInCategory(int newsCategoryId){
@@ -138,7 +138,7 @@ public class NewsFinder {
     return null;
   }
 
-    public static List listOfPublishingNews(int[] newsCategoryIds,int iLocaleId,boolean ignorePublishingDates){
+    public static List listOfPublishingNews(int[] newsCategoryIds,int iLocaleId,boolean ignorePublishingDates, int maxNumberOfNews){
         /*
       String middleTable = ((com.idega.block.text.data.ContentHome)com.idega.data.IDOLookup.getHomeLegacy(Content.class)).createLegacy().getLocalizedTextMiddleTableName(((com.idega.block.text.data.LocalizedTextHome)com.idega.data.IDOLookup.getHomeLegacy(LocalizedText.class)).createLegacy(),((com.idega.block.text.data.ContentHome)com.idega.data.IDOLookup.getHomeLegacy(Content.class)).createLegacy());
       Table news = new Table(com.idega.block.news.data.NwNewsBMPBean.getEntityTableName(), "n");
@@ -240,7 +240,7 @@ public class NewsFinder {
     //System.err.println(sql.toString());
     try {
       //return EntityFinder.findAll(((com.idega.block.news.data.NwNewsHome)com.idega.data.IDOLookup.getHomeLegacy(NwNews.class)).createLegacy(),query.toString());
-        return new Vector(((NwNewsHome)IDOLookup.getHome(NwNews.class)).findPublishedByCategoriesAndLocale(newsCategoryIds,iLocaleId,ignorePublishingDates));
+        return new Vector(((NwNewsHome)IDOLookup.getHome(NwNews.class)).findPublishedByCategoriesAndLocale(newsCategoryIds,iLocaleId,ignorePublishingDates, maxNumberOfNews));
     }
     catch (Exception ex) {
       ex.printStackTrace();
@@ -276,7 +276,7 @@ public class NewsFinder {
   }
 
   public static List listOfNewsHelpersInCategory(int[] newsCategoryId,int maxNumberOfNews,int iLocaleId){
-    List L = listOfNwNewsInCategory(newsCategoryId,iLocaleId);
+    List L = listOfNwNewsInCategory(newsCategoryId,iLocaleId, maxNumberOfNews);
     return listOfNewsHelpersInCategory(L,newsCategoryId ,maxNumberOfNews ,iLocaleId );
   }
 
