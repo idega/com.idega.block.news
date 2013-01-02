@@ -35,7 +35,7 @@ public interface NwNewsHome extends IDOHome {
      * @see com.idega.block.news.data.NwNewsBMPBean#ejbFindPublishedByCategoriesAndLocale
      */
     public Collection findPublishedByCategoriesAndLocale(int[] newsCategoryIds,
-            int iLocaleId, boolean ignorePublishingDates)
+            int iLocaleId, boolean ignorePublishingDates, int maxNumberOfNews)
             throws FinderException;
 
     /**

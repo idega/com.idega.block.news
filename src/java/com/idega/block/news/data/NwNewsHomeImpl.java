@@ -57,12 +57,12 @@ public class NwNewsHomeImpl extends IDOFactory implements NwNewsHome {
     }
 
     public Collection findPublishedByCategoriesAndLocale(int[] newsCategoryIds,
-            int iLocaleId, boolean ignorePublishingDates)
+            int iLocaleId, boolean ignorePublishingDates, int maxNumberOfNews)
             throws FinderException {
         com.idega.data.IDOEntity entity = this.idoCheckOutPooledEntity();
         java.util.Collection ids = ((NwNewsBMPBean) entity)
                 .ejbFindPublishedByCategoriesAndLocale(newsCategoryIds,
-                        iLocaleId, ignorePublishingDates);
+                        iLocaleId, ignorePublishingDates, maxNumberOfNews);
         this.idoCheckInPooledEntity(entity);
         return this.getEntityCollectionForPrimaryKeys(ids);
     }
