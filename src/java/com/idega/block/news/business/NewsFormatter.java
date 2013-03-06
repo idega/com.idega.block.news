@@ -68,9 +68,9 @@ public class NewsFormatter {
 
     newsString = TextSoap.findAndReplace(newsString,"|\r\n","");
     newsString = TextSoap.findAndReplace(newsString,"|","");
-    //Töflugerð lokið
+    //TÃ¶flugerÃ° lokiÃ°
 
-    //Búa til tengla
+    //BÃºa til tengla
     Vector linkVector = createTextLink(newsString);
 
     for ( int a = 0; a < linkVector.size(); a++ ) {
