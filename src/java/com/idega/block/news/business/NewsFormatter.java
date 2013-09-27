@@ -40,11 +40,11 @@ public class NewsFormatter {
   }
 
   public static String formatNews(String newsString,String textSize){
-    Vector tableVector = createTextTable(newsString);
+	  List<String> tableVector = createTextTable(newsString);
 
     for ( int a = 0; a < tableVector.size(); a++ ) {
 
-      String tableRow = tableVector.elementAt(a).toString();
+      String tableRow = tableVector.get(a);
       if ( a == 0 ) {
         tableRow = TextSoap.findAndReplace(tableRow,"|","</font></th><th><font size=\""+textSize+"\">");
       }
@@ -63,7 +63,7 @@ public class NewsFormatter {
       else {
         tableRow = "<tr bgcolor=\"#FFFFFF\"><td><font size=\""+textSize+"\">"+tableRow+"</font></td></tr>";
       }
-      newsString = TextSoap.findAndReplace(newsString,tableVector.elementAt(a).toString(),tableRow);
+      newsString = TextSoap.findAndReplace(newsString,tableVector.get(a),tableRow);
     }
 
     newsString = TextSoap.findAndReplace(newsString,"|\r\n","");
@@ -71,13 +71,13 @@ public class NewsFormatter {
     //Töflugerð lokið
 
     //Búa til tengla
-    Vector linkVector = createTextLink(newsString);
+    List<String> linkVector = createTextLink(newsString);
 
     for ( int a = 0; a < linkVector.size(); a++ ) {
-      String link = linkVector.elementAt(a).toString();
+      String link = linkVector.get(a);
       int comma = link.indexOf(",");
       link = "<a href=\""+link.substring(comma+1,link.length())+"\">"+link.substring(0,comma)+"</a>";
-      newsString = TextSoap.findAndReplace(newsString,"Link("+linkVector.elementAt(a).toString()+")",link);
+      newsString = TextSoap.findAndReplace(newsString,"Link("+linkVector.get(a)+")",link);
     }
 
     //Almenn hreinsun
@@ -145,16 +145,12 @@ public class NewsFormatter {
 
   }
 
-  private static Vector createTextTable(String newsString) {
-    Vector tableVector = TextSoap.FindAllBetween(newsString,"|","|\r\n");
-  return tableVector;
+  private static List<String> createTextTable(String newsString) {
+    return TextSoap.FindAllBetween(newsString,"|","|\r\n");
   }
 
-  private static Vector createTextLink(String newsString) {
-     Vector linkVector = TextSoap.FindAllBetween(newsString,"Link(",")");
-  return linkVector;
+  private static List<String> createTextLink(String newsString) {
+     return TextSoap.FindAllBetween(newsString,"Link(",")");
 }
-
-
 
 }
