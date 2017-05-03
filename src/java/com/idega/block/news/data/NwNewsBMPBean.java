@@ -6,6 +6,8 @@ package com.idega.block.news.data;
 
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.logging.Level;
 
 import javax.ejb.FinderException;
 
@@ -61,7 +63,8 @@ public class NwNewsBMPBean extends com.idega.data.GenericEntity implements  NwNe
 
   }
 
-  public void initializeAttributes(){
+  @Override
+public void initializeAttributes(){
 
     addAttribute(getIDColumnName());
 
@@ -77,7 +80,8 @@ public class NwNewsBMPBean extends com.idega.data.GenericEntity implements  NwNe
     addIndex("IDX_NW_NEWS_2", getColumnNameNewsCategoryId());
   }
 
-  public String getEntityName(){
+  @Override
+public String getEntityName(){
 
     return getEntityTableName();
 
@@ -97,7 +101,8 @@ public class NwNewsBMPBean extends com.idega.data.GenericEntity implements  NwNe
 
 
 
-  public void setDefaultValues() {
+  @Override
+public void setDefaultValues() {
 
     this.setNewsCategoryId(1);
 
@@ -111,81 +116,95 @@ public class NwNewsBMPBean extends com.idega.data.GenericEntity implements  NwNe
 
 
 
-  public int getNewsCategoryId(){
+  @Override
+public int getNewsCategoryId(){
 
     return getIntColumnValue(getColumnNameNewsCategoryId());
 
   }
-  
-  public ICCategory getNewsCategory() {
+
+  @Override
+public ICCategory getNewsCategory() {
   	return (ICCategory)getColumnValue(getColumnNameNewsCategoryId());
   }
 
-  public void setNewsCategoryId(Integer news_category_id){
+  @Override
+public void setNewsCategoryId(Integer news_category_id){
 
     setColumn(getColumnNameNewsCategoryId(), news_category_id);
 
   }
 
-  public void setNewsCategoryId(int news_category_id){
+  @Override
+public void setNewsCategoryId(int news_category_id){
 
     setColumn(getColumnNameNewsCategoryId(), new Integer(news_category_id));
 
   }
 
-  public int getContentId(){
+  @Override
+public int getContentId(){
 
     return getIntColumnValue(getColumnNameContentId());
 
   }
 
-  public void setContentId(int iContentId){
+  @Override
+public void setContentId(int iContentId){
 
     setColumn(getColumnNameContentId(),iContentId);
 
   }
 
-  public void setContentId(Integer iContentId){
+  @Override
+public void setContentId(Integer iContentId){
 
     setColumn(getColumnNameContentId(),iContentId);
 
   }
 
-  public String getAuthor(){
+  @Override
+public String getAuthor(){
 
     return getStringColumnValue(getColumnNameAuthor());
 
   }
 
-  public void setAuthor(String author){
+  @Override
+public void setAuthor(String author){
 
     setColumn(getColumnNameAuthor(), author);
 
   }
 
-  public String getSource(){
+  @Override
+public String getSource(){
 
     return getStringColumnValue(getColumnNameSource());
 
   }
 
-  public void setSource(String source){
+  @Override
+public void setSource(String source){
 
     setColumn(getColumnNameSource(), source);
 
   }
-  
-  public Content getContent(){
+
+  @Override
+public Content getContent(){
   	return (Content) this.getColumnValue(getColumnNameContentId());
   }
 
 
 
-  public Collection getRelatedFiles() throws IDORelationshipException{
+  @Override
+public Collection getRelatedFiles() throws IDORelationshipException{
   	return idoGetRelatedEntities(ICFile.class);
   }
-  
-  public Collection getLocalizedTexts() throws IDORelationshipException{
+
+  @Override
+public Collection getLocalizedTexts() throws IDORelationshipException{
       return this.idoGetRelatedEntities(LocalizedText.class);
   }
 
@@ -195,10 +214,10 @@ public class NwNewsBMPBean extends com.idega.data.GenericEntity implements  NwNe
       Table content = new Table(com.idega.block.text.data.ContentBMPBean.getEntityTableName(), "c");
       Table text = new Table(com.idega.block.text.data.LocalizedTextBMPBean.getEntityTableName(), "t");
       Table middle = new Table(middleTable, "m");
-      
+
       SelectQuery query = new SelectQuery(news);
       query.addColumn(new Column(news, getIDColumnName()));
-      
+
       query.addJoin(news, NwNewsBMPBean.getColumnNameContentId(), content, ContentBMPBean.getEntityTableName()+"_ID");
       query.addJoin(content, ContentBMPBean.getEntityTableName()+"_ID", middle, ContentBMPBean.getEntityTableName()+"_ID");
       query.addJoin(middle, LocalizedTextBMPBean.getEntityTableName()+"_ID", text, LocalizedTextBMPBean.getEntityTableName()+"_ID");
@@ -214,17 +233,22 @@ public class NwNewsBMPBean extends com.idega.data.GenericEntity implements  NwNe
       	query.addCriteria(new AND(from, to));
       }
       query.addOrder(content, ContentBMPBean.getColumnNameCreated(), false);
-      
-      return idoFindPKsByQuery(query, maxNumberOfNews);
+
+      try {
+    	  return idoFindPKsByQuery(query, maxNumberOfNews);
+      } catch (Exception e) {
+    	  getLogger().log(Level.WARNING, "Error executing query: " + query, e);
+      }
+      return Collections.emptyList();
   }
 
   public Collection ejbFindPublishedByCategory(int newsCategoryId,boolean ignorePublishingDates)throws FinderException{
       Table news = new Table(com.idega.block.news.data.NwNewsBMPBean.getEntityTableName(), "n");
       Table content = new Table(com.idega.block.text.data.ContentBMPBean.getEntityTableName(), "c");
-      
+
       SelectQuery query = new SelectQuery(news);
       query.addColumn(new Column(news, getIDColumnName()));
-      
+
       query.addJoin(news, NwNewsBMPBean.getColumnNameContentId(), content, ContentBMPBean.getEntityTableName()+"_ID");
       query.addCriteria(new MatchCriteria(news, NwNewsBMPBean.getColumnNameNewsCategoryId(), MatchCriteria.EQUALS, newsCategoryId));
       if (!ignorePublishingDates ) {
