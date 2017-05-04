@@ -222,7 +222,10 @@ public Collection getLocalizedTexts() throws IDORelationshipException{
       query.addJoin(content, ContentBMPBean.getEntityTableName()+"_ID", middle, ContentBMPBean.getEntityTableName()+"_ID");
       query.addJoin(middle, LocalizedTextBMPBean.getEntityTableName()+"_ID", text, LocalizedTextBMPBean.getEntityTableName()+"_ID");
 
-      query.addCriteria(new InCriteria(news, NwNewsBMPBean.getColumnNameNewsCategoryId(), newsCategoryIds));
+      if (newsCategoryIds != null && newsCategoryIds.length > 0) {
+    	  query.addCriteria(new InCriteria(news, NwNewsBMPBean.getColumnNameNewsCategoryId(), newsCategoryIds));
+      }
+
       query.addCriteria(new MatchCriteria(text, LocalizedTextBMPBean.getColumnNameLocaleId(), MatchCriteria.EQUALS, iLocaleId));
       if (!ignorePublishingDates ) {
       	IWTimestamp today = IWTimestamp.RightNow();
