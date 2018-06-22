@@ -21,6 +21,7 @@ public class NewsItem implements Serializable {
 	private String category;
 	private String timestamp;
 	private String link;
+	private String imageUrl;
 
 	@XmlAttribute(name = "id")
 	public int getId() {
@@ -71,7 +72,7 @@ public class NewsItem implements Serializable {
 	public void setCategoryId(int categoryId) {
 		this.categoryId = categoryId;
 	}
-	
+
 	public String getCategory() {
 		return category;
 	}
@@ -95,5 +96,15 @@ public class NewsItem implements Serializable {
 	public void setLink(String link) {
 		this.link = link;
 	}
+
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
+
+
 
 }
